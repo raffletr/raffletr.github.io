@@ -23,7 +23,9 @@
   --fire:linear-gradient(135deg,#ff2d55,#ff9500);
   --gold:linear-gradient(135deg,#ffd60a,#ff9500);
 }
-html{scroll-behavior:smooth;height:100%}
+[data-theme=light]{--bg:#f0f0f8;--s2:#e4e4f0;--card:rgba(0,0,0,.04);--border:rgba(0,0,0,.09);--t1:#0a0a18;--t2:#444460;--t3:#9090a8}
+
+html{scroll-behavior:smooth;height:100%;font-size:var(--font-size,14px)}
 body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--t1);min-height:100vh;min-height:100dvh;overflow-x:hidden;line-height:1.5;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}
 @media(min-width:1024px){.disc-body,.dash,.pr-body,.cw{max-width:960px;margin:0 auto}.grid,.my-grid{grid-template-columns:repeat(auto-fill,minmax(280px,1fr))}.kpis{grid-template-columns:repeat(4,1fr)}}
 @media(min-width:600px)and(max-width:1023px){.grid,.my-grid{grid-template-columns:repeat(2,1fr)}}
@@ -41,7 +43,7 @@ nav{padding-top:env(safe-area-inset-top);height:calc(56px + env(safe-area-inset-
 @keyframes ab{0%,100%{transform:translate(0,0)}50%{transform:translate(20px,-20px)}}
 
 /* NAV */
-nav{position:fixed;top:0;left:0;right:0;z-index:100;height:54px;display:flex;align-items:center;padding:0 14px;background:rgba(5,5,15,0.9);backdrop-filter:blur(30px);border-bottom:1px solid var(--border)}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;height:calc(54px + env(safe-area-inset-top));display:flex;align-items:center;padding:0 14px;background:rgba(5,5,15,0.9);backdrop-filter:blur(30px);border-bottom:1px solid var(--border)}
 .logo{font-family:'Unbounded',sans-serif;font-weight:900;font-size:15px;background:var(--fire);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-right:14px;cursor:pointer}
 .tabs{display:flex;gap:2px;flex:1}
 .tab{padding:6px 10px;border-radius:8px;font-size:12px;font-weight:500;color:var(--t3);cursor:pointer;border:none;background:none;font-family:'Outfit',sans-serif;transition:all .18s}
@@ -393,6 +395,7 @@ textarea.inp{resize:vertical}
 <body>
 <div id="amb"><div class="ab ab1"></div><div class="ab ab2"></div></div>
 <canvas id="cnf"></canvas>
+<div id="offline-bar" style="position:fixed;bottom:0;left:0;right:0;z-index:600;background:rgba(255,45,85,.92);color:#fff;text-align:center;padding:9px;font-size:12px;font-weight:600;transform:translateY(100%);transition:transform .3s;backdrop-filter:blur(10px)">&#128245; Internet baglantisi yok</div>
 <div id="toasts"></div>
 
 <div id="notifBar" class="notif notif-info" style="display:none"></div>
@@ -403,8 +406,37 @@ textarea.inp{resize:vertical}
     <button class="tab" data-p="pgP">📊 <span>Panel</span></button>
     <button class="tab" data-p="pgC">✨ <span>Olustur</span></button>
   </div>
-  <div id="navR"></div><button id="installBtn" class="btn ghost sm hidden" style="font-size:10px;padding:5px 8px;flex-shrink:0">📲 Yukle</button>
+  <div id="navR" style="display:flex;align-items:center;gap:4px;margin-left:auto;flex-shrink:0">
+    <div id="connDot" style="width:6px;height:6px;border-radius:50%;background:var(--grn);transition:background .3s;flex-shrink:0" title="Baglanti"></div>
+    <div id="ncBtn" style="width:28px;height:28px;border-radius:8px;background:var(--card);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;flex-shrink:0;position:relative">&#128276;<div id="ncDot" style="position:absolute;top:3px;right:3px;width:7px;height:7px;background:var(--red);border-radius:50%;border:1.5px solid var(--bg);display:none"></div></div>
+    <div id="settBtn" style="width:28px;height:28px;border-radius:8px;background:var(--card);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;flex-shrink:0">&#9881;&#65039;</div>
+    <div id="themeBtn" style="width:28px;height:28px;border-radius:8px;background:var(--card);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;flex-shrink:0">&#127769;</div>
+  </div><button id="installBtn" class="btn ghost sm hidden" style="font-size:10px;padding:5px 8px;flex-shrink:0">📲 Yukle</button>
 </nav>
+
+<!-- NOTIFICATION CENTER -->
+<div id="nc" style="position:fixed;top:54px;right:0;width:280px;max-height:370px;overflow-y:auto;z-index:150;background:linear-gradient(150deg,#0f0f22,#05050f);border:1px solid var(--border);border-radius:0 0 0 14px;transform:translateX(100%);transition:transform .28s ease;box-shadow:-4px 4px 20px rgba(0,0,0,.5)">
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 13px;border-bottom:1px solid var(--border)">
+    <div style="font-family:Unbounded,sans-serif;font-size:11px;font-weight:700">Bildirimler</div>
+    <button id="ncClr" style="font-size:11px;color:var(--t3);cursor:pointer;background:none;border:none;font-family:Outfit,sans-serif">Temizle</button>
+  </div>
+  <div id="ncList"></div>
+</div>
+
+<!-- SETTINGS PANEL -->
+<div id="settBd" style="position:fixed;inset:0;z-index:440;background:rgba(0,0,0,.6);display:none;backdrop-filter:blur(8px)"></div>
+<div id="settPanel" style="position:fixed;bottom:0;left:0;right:0;z-index:450;background:linear-gradient(160deg,#0f0f22,#05050f);border:1px solid var(--border);border-top-left-radius:22px;border-top-right-radius:22px;padding:16px 15px 28px;transform:translateY(100%);transition:transform .32s cubic-bezier(.34,1.56,.64,1);max-height:80vh;overflow-y:auto">
+  <div style="width:34px;height:4px;background:rgba(255,255,255,.15);border-radius:2px;margin:0 auto 14px"></div>
+  <div style="font-family:Unbounded,sans-serif;font-size:13px;font-weight:700;margin-bottom:14px">&#9881;&#65039; Ayarlar</div>
+  <div class="tog-row"><div><div class="tog-title">&#127769; Karanlik Mod</div></div><label class="tog"><input type="checkbox" id="darkTog" checked><span class="tog-sl"></span></label></div>
+  <div class="tog-row"><div><div class="tog-title">&#128276; Tarayici Bildirimleri</div></div><label class="tog"><input type="checkbox" id="pushTog"><span class="tog-sl"></span></label></div>
+  <div class="field" style="margin-top:8px">
+    <label class="lbl">Yazi Boyutu</label>
+    <input type="range" id="fontRange" min="12" max="18" value="14" style="width:100%;accent-color:var(--red)">
+    <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--t3);margin-top:2px"><span>Kucuk</span><span id="fontLbl">14px</span><span>Buyuk</span></div>
+  </div>
+  <button class="btn ghost block" style="margin-top:8px;font-size:12px" id="settClose">Kapat</button>
+</div>
 
 <!-- DISCOVER -->
 <div id="pgD" class="pg on">
@@ -419,6 +451,37 @@ textarea.inp{resize:vertical}
     </div>
   </div>
   <div class="body">
+    <!-- SEARCH -->
+    <div style="position:relative;margin-bottom:10px">
+      <span style="position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:13px;pointer-events:none;color:var(--t3)">&#128269;</span>
+      <input class="inp" id="discSearch" placeholder="Cekilis ara..." style="padding-left:34px">
+      <button id="discSearchClr" style="position:absolute;right:9px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--t3);cursor:pointer;font-size:13px;padding:3px;display:none">&#10005;</button>
+    </div>
+    <!-- CATEGORY PILLS -->
+    <div style="display:flex;gap:5px;margin-bottom:10px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;padding-bottom:2px">
+      <div class="cat chip on" data-c="all">Tumu</div>
+      <div class="cat chip" data-c="tech">&#128187; Teknoloji</div>
+      <div class="cat chip" data-c="game">&#127918; Oyun</div>
+      <div class="cat chip" data-c="fashion">&#128247; Moda</div>
+      <div class="cat chip" data-c="food">&#127829; Yiyecek</div>
+      <div class="cat chip" data-c="sport">&#9917; Spor</div>
+      <div class="cat chip" data-c="other">&#128230; Diger</div>
+    </div>
+    <!-- SORT + STATUS -->
+    <div style="display:flex;gap:6px;margin-bottom:10px;align-items:center">
+      <span style="font-size:11px;color:var(--t3);white-space:nowrap">Sirala:</span>
+      <select id="discSort" style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:5px 10px;color:var(--t1);font-family:Outfit,sans-serif;font-size:11px;outline:none;cursor:pointer;flex:1;-webkit-appearance:none">
+        <option value="new">Yeni</option>
+        <option value="popular">Populer</option>
+        <option value="ending">Bitmesine Yakin</option>
+        <option value="old">Eski</option>
+      </select>
+      <select id="discStatus" style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:5px 10px;color:var(--t1);font-family:Outfit,sans-serif;font-size:11px;outline:none;cursor:pointer;-webkit-appearance:none">
+        <option value="all">Tumu</option>
+        <option value="live">Aktif</option>
+        <option value="end">Bitti</option>
+      </select>
+    </div>
     <div class="chips">
       <div class="chip on" data-f="all">Tumu</div>
       <div class="chip" data-f="live">Aktif</div>
@@ -467,6 +530,15 @@ textarea.inp{resize:vertical}
       <div style="font-size:12px;color:var(--t2);margin-bottom:16px"><span id="cntInfo"></span></div>
 
       <div class="sec">
+        <div class="sec-title">Hizli Sablon</div>
+        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:7px;margin-bottom:10px" id="tplGrid">
+          <div class="gc tpl" data-t="tech" style="padding:10px;cursor:pointer;border-radius:12px;border:1px solid var(--border);background:var(--card);transition:all .16s"><div style="font-size:20px;margin-bottom:4px">&#128187;</div><div style="font-size:12px;font-weight:600">Teknoloji</div><div style="font-size:10px;color:var(--t3);margin-top:1px">iPhone, Laptop</div></div>
+          <div class="gc tpl" data-t="game" style="padding:10px;cursor:pointer;border-radius:12px;border:1px solid var(--border);background:var(--card);transition:all .16s"><div style="font-size:20px;margin-bottom:4px">&#127918;</div><div style="font-size:12px;font-weight:600">Oyun</div><div style="font-size:10px;color:var(--t3);margin-top:1px">Steam, PSN kodu</div></div>
+          <div class="gc tpl" data-t="fashion" style="padding:10px;cursor:pointer;border-radius:12px;border:1px solid var(--border);background:var(--card);transition:all .16s"><div style="font-size:20px;margin-bottom:4px">&#128247;</div><div style="font-size:12px;font-weight:600">Moda</div><div style="font-size:10px;color:var(--t3);margin-top:1px">Kiyafet, Canta</div></div>
+          <div class="gc tpl" data-t="food" style="padding:10px;cursor:pointer;border-radius:12px;border:1px solid var(--border);background:var(--card);transition:all .16s"><div style="font-size:20px;margin-bottom:4px">&#127829;</div><div style="font-size:12px;font-weight:600">Yiyecek</div><div style="font-size:10px;color:var(--t3);margin-top:1px">Market, Restoran</div></div>
+        </div>
+      </div>
+      <div class="sec">
         <div class="sec-title">Cekilis Gorseli</div>
         <div class="img-area" id="imgArea">
           <input type="file" id="imgFile" accept="image/*">
@@ -484,8 +556,30 @@ textarea.inp{resize:vertical}
       <div class="sec">
         <div class="sec-title">Temel Bilgiler</div>
         <div class="field"><label class="lbl">Cekilis Adi *</label><input class="inp" id="cName" placeholder="iPhone 16 Cekilisi"></div>
-        <div class="field"><label class="lbl">Bitis Tarihi</label><input class="inp" type="datetime-local" id="cEnd"></div>
+        <div class="field">
+          <label class="lbl">Bitis Tarihi</label>
+          <input class="inp" type="datetime-local" id="cEnd">
+          <div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:6px" id="durBtns">
+            <button class="dur-btn" data-d="1" style="padding:4px 10px;border-radius:8px;font-size:10px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--card);color:var(--t2);transition:all .14s;user-select:none">1 Gun</button>
+            <button class="dur-btn" data-d="3" style="padding:4px 10px;border-radius:8px;font-size:10px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--card);color:var(--t2);transition:all .14s;user-select:none">3 Gun</button>
+            <button class="dur-btn" data-d="7" style="padding:4px 10px;border-radius:8px;font-size:10px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--card);color:var(--t2);transition:all .14s;user-select:none">1 Hafta</button>
+            <button class="dur-btn" data-d="14" style="padding:4px 10px;border-radius:8px;font-size:10px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--card);color:var(--t2);transition:all .14s;user-select:none">2 Hafta</button>
+            <button class="dur-btn" data-d="30" style="padding:4px 10px;border-radius:8px;font-size:10px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--card);color:var(--t2);transition:all .14s;user-select:none">1 Ay</button>
+          </div>
+        </div>
         <div class="field"><label class="lbl">Aciklama</label><input class="inp" id="cDesc" placeholder="Katilmak icin Gmail adresini gir!"></div>
+        <div class="field"><label class="lbl">Kategori</label>
+          <select class="inp" id="cCat">
+            <option value="">Seciniz</option>
+            <option value="tech">&#128187; Teknoloji</option>
+            <option value="game">&#127918; Oyun</option>
+            <option value="fashion">&#128247; Moda</option>
+            <option value="food">&#127829; Yiyecek</option>
+            <option value="sport">&#9917; Spor</option>
+            <option value="other">&#128230; Diger</option>
+          </select>
+        </div>
+        <div class="field"><label class="lbl">Cekilis Kurallari</label><textarea class="inp" id="cRules" placeholder="1. Her kisi 1 kez katilabilir&#10;2. Kazanan 7 gun icinde odul alir" rows="3"></textarea></div>
       </div>
 
       <div class="sec">
@@ -509,6 +603,15 @@ textarea.inp{resize:vertical}
           <label class="lbl">Max Katilimci (0 = sinirsiz)</label>
           <input class="inp" id="cMaxP" type="number" min="0" placeholder="0" value="0">
         </div>
+        <div class="tog-row">
+          <div><div class="tog-title">&#129302; CAPTCHA Korumasi</div><div class="tog-sub">Matematik sorusuyla bot engeli</div></div>
+          <label class="tog"><input type="checkbox" id="cCaptcha"><span class="tog-sl"></span></label>
+        </div>
+        <div class="tog-row">
+          <div><div class="tog-title">&#128286; Yas Onayi (18+)</div><div class="tog-sub">Katilimci yasini onaylamali</div></div>
+          <label class="tog"><input type="checkbox" id="cAge"><span class="tog-sl"></span></label>
+        </div>
+        <div class="field"><label class="lbl">Sosyal Medya Sarti</label><input class="inp" id="cSocial" placeholder="@hesap_adi takip edilmeli (istege bagli)"></div>
         <div class="field"><label class="lbl">E-posta Konusu</label><input class="inp" id="cSubj" value="Tebrikler! Cekilisi Kazandiniz!"></div>
       </div>
 
@@ -741,7 +844,7 @@ textarea.inp{resize:vertical}
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
 import{getAuth,signInWithPopup,GoogleAuthProvider,onAuthStateChanged,signOut}from"https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-import{getFirestore,collection,addDoc,doc,setDoc,getDoc,getDocs,updateDoc,deleteDoc,query,where,onSnapshot,increment}from"https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+import{getFirestore,collection,addDoc,doc,setDoc,getDoc,getDocs,updateDoc,deleteDoc,query,where,onSnapshot,increment,serverTimestamp}from"https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
 const app=initializeApp({apiKey:"AIzaSyAIFpdDza_jwo0W4uQ_wAiTL3jvFLGmFzU",authDomain:"it-s-time-for-the-draw.firebaseapp.com",projectId:"it-s-time-for-the-draw",storageBucket:"it-s-time-for-the-draw.firebasestorage.app",messagingSenderId:"526815408485",appId:"1:526815408485:web:749ad3761c8f97ca14718c"});
 const auth=getAuth(app),db=getFirestore(app);
@@ -1247,8 +1350,19 @@ document.getElementById("pubBtn").addEventListener("click",async()=>{
     const existCheck=await getDoc(doc(db,"giveaways",drawId));
     if(existCheck.exists()){toast("Bu isimde cekilis zaten var! Farkli bir isim dene.","warn");return;}
     const maxP=parseInt(document.getElementById("cMaxP").value)||0;
-    await setDoc(doc(db,"giveaways",drawId),{creatorId:ME.uid,creatorName:safeC,drawName:safeG,prizes,endTime,desc,emailSubject:subj,isPrivate,imageUrl,maxParticipants:maxP,ejsService:ejsS,ejsTemplate:ejsT,ejsKey:ejsK,organizerEmail:ME.email||'',partCount:0,winCount:0,emailsSent:0,createdAt:new Date()});
-    const link=location.origin+location.pathname+"?c="+safeC+"&g="+safeG;
+    const drawRef=await addDoc(collection(db,"giveaways"),{
+      creatorId:ME.uid,creatorName:safeC,drawName:safeG,prizes,endTime,desc,
+      rules:document.getElementById("cRules")?.value.trim()||"",
+      category:document.getElementById("cCat")?.value||"",
+      socialRequirement:document.getElementById("cSocial")?.value.trim()||"",
+      captchaEnabled:document.getElementById("cCaptcha")?.checked||false,
+      ageRequired:document.getElementById("cAge")?.checked||false,
+      emailSubject:subj,isPrivate,imageUrl,maxParticipants:maxP,
+      ejsService:ejsS,ejsTemplate:ejsT,ejsKey:ejsK,
+      organizerEmail:ME.email||"",partCount:0,winCount:0,emailsSent:0,createdAt:new Date()
+    });
+    const drawId2=drawRef.id;
+    const link=location.origin+location.pathname+"?g="+drawId2;
     document.getElementById("linkUrl").textContent=link;
     document.getElementById("linkBox").classList.remove("hidden");
     document.getElementById("copyBtn").onclick=()=>{navigator.clipboard.writeText(link);toast("Kopyalandi!");};
@@ -1819,7 +1933,14 @@ function runLive(){
 // ── PARTICIPANT ──
 let ppUnsub=null;
 async function initPP(){
-  const drawId=urlC+"_"+urlG;
+  // Support both new (?g=drawId) and legacy (?c=creator&g=name) URL formats
+  let drawId=urlG; // new format: ?g=autoId
+  if(urlC&&urlG&&urlG.indexOf("_")===-1){
+    // legacy: might be ?c=creator&g=name, try combined
+    const legacyId=urlC+"_"+urlG;
+    const legacyCheck=await getDoc(doc(db,"giveaways",legacyId)).catch(()=>null);
+    if(legacyCheck?.exists()) drawId=legacyId;
+  }
   document.getElementById("ppTitle").innerHTML='<span>'+(urlG||"").replace(/_/g," ")+'</span>';
   document.getElementById("ppBy").textContent=(urlC||"").replace(/_/g," ")+" tarafindan";
   const lsKey="joined_"+drawId;
@@ -2093,6 +2214,116 @@ function openSupport(drawName, creatorEmail, participantEmail){
 
 if(!isPart&&!isProf)loadDiscover();
 
+// ── TEMPLATES ──
+const TPLS={
+  tech:{name:"iPhone 16 Cekilisi",cat:"tech",desc:"Katilmak icin Gmail adresini gir!",prize:"iPhone 16 Pro",rules:"1. Her kisi 1 kez katilabilir\n2. Kazanan 7 gunde odul alir"},
+  game:{name:"Steam Cekilisi",cat:"game",desc:"Oyun severlere ozel!",prize:"100 TL Steam Kodu",rules:"1. Aktif Steam hesabi gerekli\n2. Kod 24 saatte gonderilir"},
+  fashion:{name:"Moda Cekilisi",cat:"fashion",desc:"Trend urunler!",prize:"500 TL Alisveris Ceki",rules:"1. Turkiye geneli gecerli"},
+  food:{name:"Yemek Cekilisi",cat:"food",desc:"Lezzetli oduller!",prize:"200 TL Yemeksepeti",rules:"1. Aktif hesap gerekli"},
+};
+document.getElementById("tplGrid")?.querySelectorAll(".tpl").forEach(t=>t.addEventListener("click",()=>{
+  const tpl=TPLS[t.dataset.t];if(!tpl)return;
+  const g=id=>document.getElementById(id);
+  if(g("cName"))g("cName").value=tpl.name;
+  if(g("cCat"))g("cCat").value=tpl.cat;
+  if(g("cDesc"))g("cDesc").value=tpl.desc;
+  if(g("cRules"))g("cRules").value=tpl.rules;
+  const ti=document.querySelector(".tier-inp");if(ti)ti.value=tpl.prize;
+  toast("Sablon uygulandi!");
+}));
+
+// ── DURATION BUTTONS ──
+document.getElementById("durBtns")?.querySelectorAll("[data-d]").forEach(b=>b.addEventListener("click",()=>{
+  const d=new Date(Date.now()+parseInt(b.dataset.d)*86400000);
+  d.setSeconds(0);d.setMilliseconds(0);
+  const loc=new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,16);
+  const el=document.getElementById("cEnd");if(el)el.value=loc;
+  toast(b.dataset.d+" gun sonra bitis!");
+}));
+
+// ── SEARCH ──
+document.getElementById("discSearch")?.addEventListener("input",function(){
+  document.getElementById("discSearchClr")?.classList.toggle("on",!!this.value.trim());
+  clearTimeout(this._t);this._t=setTimeout(()=>{searchQ=this.value.trim();renderDiscover();},300);
+});
+document.getElementById("discSearchClr")?.addEventListener("click",()=>{
+  const s=document.getElementById("discSearch");if(s)s.value="";
+  searchQ="";document.getElementById("discSearchClr")?.classList.remove("on");renderDiscover();
+});
+
+// ── CATS + SORT ──
+document.querySelectorAll(".cat").forEach(c=>c.addEventListener("click",()=>{
+  document.querySelectorAll(".cat").forEach(x=>x.classList.remove("on"));
+  c.classList.add("on");curCat=c.dataset.c;renderDiscover();
+}));
+document.getElementById("discSort")?.addEventListener("change",e=>{curSort=e.target.value;renderDiscover();});
+document.getElementById("discStatus")?.addEventListener("change",e=>{curStatus=e.target.value;renderDiscover();});
+
+// ── DARK/LIGHT THEME ──
+const savedTheme=localStorage.getItem("r_theme")||"dark";
+function applyTheme(dark){
+  if(dark)document.body.removeAttribute("data-theme");
+  else document.body.setAttribute("data-theme","light");
+  localStorage.setItem("r_theme",dark?"dark":"light");
+  const tb=document.getElementById("themeBtn");if(tb)tb.textContent=dark?"🌙":"☀️";
+}
+applyTheme(savedTheme==="dark");
+document.getElementById("themeBtn")?.addEventListener("click",()=>{
+  const isDark=document.body.getAttribute("data-theme")!=="light";
+  applyTheme(!isDark);
+});
+
+// ── SETTINGS PANEL ──
+function openSett(){document.getElementById("settPanel")?.classList.add("on");document.getElementById("settBd")?.classList.add("on");}
+function closeSett(){document.getElementById("settPanel")?.classList.remove("on");document.getElementById("settBd")?.classList.remove("on");}
+document.getElementById("settBtn")?.addEventListener("click",openSett);
+document.getElementById("settClose")?.addEventListener("click",closeSett);
+document.getElementById("settBd")?.addEventListener("click",closeSett);
+
+// ── FONT SIZE ──
+const fontRange=document.getElementById("fontRange");
+if(fontRange){
+  const saved=localStorage.getItem("r_font")||"14";
+  fontRange.value=saved;document.documentElement.style.setProperty("--font-size",saved+"px");
+  const fl=document.getElementById("fontLbl");if(fl)fl.textContent=saved+"px";
+  fontRange.addEventListener("input",e=>{
+    document.documentElement.style.setProperty("--font-size",e.target.value+"px");
+    const fl2=document.getElementById("fontLbl");if(fl2)fl2.textContent=e.target.value+"px";
+    localStorage.setItem("r_font",e.target.value);
+  });
+}
+
+// ── NOTIFICATION CENTER ──
+const notifs=JSON.parse(localStorage.getItem("r_notifs")||"[]");
+function addNotif(icon,text){
+  notifs.unshift({icon,text,time:Date.now(),unread:true});
+  if(notifs.length>25)notifs.splice(25);
+  localStorage.setItem("r_notifs",JSON.stringify(notifs));
+  renderNC2();
+  document.getElementById("ncDot")?.classList.add("on");
+}
+function renderNC2(){
+  const list=document.getElementById("ncList");if(!list)return;
+  if(!notifs.length){list.innerHTML="<div style='padding:20px;text-align:center;color:var(--t3);font-size:12px'>Bildirim yok</div>";return;}
+  list.innerHTML=notifs.map(n=>{
+    const ago=Math.round((Date.now()-n.time)/60000);
+    const t=ago<1?"Az once":ago<60?ago+"dk":Math.round(ago/60)+"sa";
+    return'<div style="display:flex;align-items:flex-start;gap:7px;padding:9px 13px;border-bottom:1px solid var(--border)'+(n.unread?";background:rgba(255,45,85,.04);border-left:2px solid var(--red)":"")+'"><div style="font-size:15px">'+n.icon+'</div><div><div style="font-size:12px;color:var(--t1);line-height:1.4">'+n.text+'</div><div style="font-size:10px;color:var(--t3);margin-top:2px">'+t+'</div></div></div>';
+  }).join("");
+}
+renderNC2();
+if(notifs.some(n=>n.unread))document.getElementById("ncDot")?.classList.add("on");
+const ncBtn=document.getElementById("ncBtn"),nc=document.getElementById("nc");
+ncBtn?.addEventListener("click",()=>{
+  nc?.classList.toggle("on");
+  if(nc?.classList.contains("on")){
+    notifs.forEach(n=>n.unread=false);localStorage.setItem("r_notifs",JSON.stringify(notifs));
+    document.getElementById("ncDot")?.classList.remove("on");
+  }
+});
+document.addEventListener("click",e=>{if(nc?.classList.contains("on")&&!nc.contains(e.target)&&!ncBtn?.contains(e.target))nc.classList.remove("on");});
+document.getElementById("ncClr")?.addEventListener("click",()=>{notifs.length=0;localStorage.setItem("r_notifs","[]");renderNC2();});
+
 // PWA Install prompt
 let deferredPrompt=null;
 window.addEventListener('beforeinstallprompt',e=>{
@@ -2113,9 +2344,19 @@ window.addEventListener('appinstalled',()=>{
 });
 
 // Register service worker for PWA
-if('serviceWorker' in navigator){
-  navigator.serviceWorker.register('/sw.js').catch(()=>{});
-}
+if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js').catch(()=>{});}
+
+// ── ONLINE/OFFLINE ──
+const connDotEl=document.getElementById("connDot");
+const offBarEl=document.getElementById("offline-bar");
+window.addEventListener("online",()=>{if(connDotEl)connDotEl.style.background="var(--grn)";if(offBarEl)offBarEl.style.transform="translateY(100%)";toast("Baglanti yenilendi","ok");});
+window.addEventListener("offline",()=>{if(connDotEl)connDotEl.style.background="var(--red)";if(offBarEl)offBarEl.style.transform="translateY(0)";});
+if(!navigator.onLine){if(connDotEl)connDotEl.style.background="var(--red)";if(offBarEl)offBarEl.style.transform="translateY(0)";}
+
+// ── PUSH NOTIFICATIONS ──
+document.getElementById("pushTog")?.addEventListener("change",async e=>{
+  if(e.target.checked){const p=await Notification.requestPermission();e.target.checked=p==="granted";}
+});
 </script>
 </body>
 </html>
