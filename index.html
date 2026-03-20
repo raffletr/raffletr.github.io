@@ -655,6 +655,7 @@ select.inp{cursor:pointer;background-image:none}
   </div>
   <div class="pp-body">
     <div class="pp-sp" id="ppSP"></div>
+    <div id="ppTicker" style="display:none;background:rgba(10,132,255,.08);border:1px solid rgba(10,132,255,.2);border-radius:10px;padding:7px 13px;font-size:11px;color:var(--blu);margin-bottom:13px;text-align:center;animation:fu .3s ease both"></div>
     <div id="ppPrizes" class="pp-prizes" style="display:none"></div>
     <div id="ppProg" class="pp-prog" style="display:none">
       <div class="pp-prog-top"><span id="ppPLeft">0 katılımcı</span><span id="ppPRight"></span></div>
@@ -911,12 +912,12 @@ select.inp{cursor:pointer;background-image:none}
 })();
 </script>
 <script type="module">
-import{initializeApp}from"https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-import{getAuth,signInWithPopup,GoogleAuthProvider,onAuthStateChanged,signOut}from"https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-import{getFirestore,collection,addDoc,doc,setDoc,getDoc,getDocs,updateDoc,deleteDoc,query,where,onSnapshot,increment,serverTimestamp}from"https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import{getAuth,signInWithPopup,GoogleAuthProvider,onAuthStateChanged,signOut}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import{initializeFirestore,getFirestore,collection,addDoc,doc,setDoc,getDoc,getDocs,updateDoc,deleteDoc,query,where,onSnapshot,increment,serverTimestamp}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const FB=initializeApp({apiKey:"AIzaSyAIFpdDza_jwo0W4uQ_wAiTL3jvFLGmFzU",authDomain:"it-s-time-for-the-draw.firebaseapp.com",projectId:"it-s-time-for-the-draw",storageBucket:"it-s-time-for-the-draw.firebasestorage.app",messagingSenderId:"526815408485",appId:"1:526815408485:web:749ad3761c8f97ca14718c"});
-const auth=getAuth(FB),db=getFirestore(FB);
+const auth=getAuth(FB),db=initializeFirestore(FB,{experimentalAutoDetectLongPolling:true,experimentalForceLongPolling:false});
 const IMGBB=["64bf7bf15a675de664cc16d1576f95db","4340f8e33694e83c19a232aef27981df","38d40443d42f6aa86761971df10d4162"];
 const ADMIN="necron.offical@gmail.com";
 
@@ -938,9 +939,11 @@ function dbgErr(...a){if(isAdmin)_err(...a);}
 // ── HELPERS ──
 let ME=null;
 function toast(msg,type="info"){
+  const icons={ok:"✅",err:"❌",warn:"⚠️",info:"ℹ️"};
   const el=document.createElement("div");
   el.className="toast toast-"+(type==="err"?"err":type==="warn"?"warn":type==="ok"?"ok":"info");
-  el.textContent=msg;
+  el.innerHTML='<span style="flex-shrink:0">'+(icons[type]||"ℹ️")+'</span><span>'+msg+'</span>';
+  el.style.display="flex";el.style.alignItems="flex-start";el.style.gap="7px";
   const t=document.getElementById("toasts");
   if(t)t.appendChild(el);
   setTimeout(()=>{el.classList.add("out");setTimeout(()=>el.remove(),230)},3500);
@@ -1012,6 +1015,22 @@ window.addEventListener("online",()=>{cdot?.classList.remove("off");off?.classLi
 window.addEventListener("offline",()=>{cdot?.classList.add("off");off?.classList.add("on");});
 if(!navigator.onLine){cdot?.classList.add("off");off?.classList.add("on");}
 
+// Scroll-to-top button
+const topBtn=document.getElementById("topBtn");
+window.addEventListener("scroll",()=>{if(topBtn)topBtn.style.display=window.scrollY>300?"flex":"none";},{passive:true});
+
+// Pull-to-refresh on discover
+(function(){
+  let startY=0,pulling=false;
+  window.addEventListener("touchstart",e=>{startY=e.touches[0].clientY;},{passive:true});
+  window.addEventListener("touchmove",e=>{
+    if(!document.getElementById("pgD")?.classList.contains("on"))return;
+    if(window.scrollY>0)return;
+    const dy=e.touches[0].clientY-startY;
+    if(dy>90&&!pulling){pulling=true;toast("🔄 Yenileniyor...","info");setTimeout(()=>{loadDiscover();pulling=false;},800);}
+  },{passive:true});
+})();
+
 // ── PWA ──
 let dp=null;
 window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();dp=e;document.getElementById("installBtn").style.display="flex";});
@@ -1057,6 +1076,9 @@ onAuthStateChanged(auth,user=>{
   document.getElementById("myAva")?.remove();
   document.getElementById("outBtn")?.remove();
   document.getElementById("myNameSpan")?.remove();
+
+  // Normal flow — load discover
+  if(!window._discLoaded){window._discLoaded=true;loadDiscover();}
 
   if(ME){
     const nm=(ME.displayName||ME.email||"K").trim();
@@ -1195,95 +1217,220 @@ document.getElementById("draftBtn")?.addEventListener("click",()=>{
 let allDraws=[],curCat="all",curSort="new",curStatus="all",searchQ="";
 
 async function loadDiscover(){
-  const g=document.getElementById("discGrid");if(!g)return;
-  g.innerHTML='<div class="empty"><span class="spin"></span></div>';
+  const g=document.getElementById("discGrid");
+  if(!g)return;
+  // Skeleton cards
+  g.innerHTML=Array(4).fill('<div class="gc" style="overflow:hidden;animation:none"><div class="skel" style="height:140px;border-radius:18px 18px 0 0"></div><div style="padding:13px"><div class="skel" style="height:12px;width:60%;margin-bottom:8px;border-radius:6px"></div><div class="skel" style="height:16px;width:85%;margin-bottom:6px;border-radius:6px"></div><div class="skel" style="height:11px;width:70%;border-radius:6px"></div></div></div>').join("");
+
   try{
     const snap=await getDocs(collection(db,"giveaways"));
-    allDraws=[];let tp=0,tw=0;
-    snap.forEach(d=>{const dw={id:d.id,...d.data()};allDraws.push(dw);if(!dw.isPrivate){tp+=(dw.partCount||0);tw+=(dw.winCount||0);}});
-    const live=allDraws.filter(d=>!d.isPrivate&&!(d.endTime&&new Date(d.endTime)<new Date())).length;
-    document.getElementById("sA").textContent=live;
-    document.getElementById("sK").textContent=tp;
-    document.getElementById("sW").textContent=tw;
-    document.getElementById("sT").textContent=allDraws.filter(d=>!d.isPrivate).length;
+    allDraws=[];
+    let tp=0,tw=0;
+    snap.forEach(d=>{
+      const dw={id:d.id,...d.data()};
+      allDraws.push(dw);
+      if(!dw.isPrivate){tp+=(dw.partCount||0);tw+=(dw.winCount||0);}
+    });
+
+    const now=new Date();
+    const live=allDraws.filter(d=>!d.isPrivate&&!(d.endTime&&new Date(d.endTime)<now)).length;
+    const total=allDraws.filter(d=>!d.isPrivate).length;
+
+    // Animated counters
+    animCount("sA",live);
+    animCount("sK",tp);
+    animCount("sW",tw);
+    animCount("sT",total);
+
     renderDiscover();
-    clearInterval(window._cdTick);window._cdTick=setInterval(tickCds,1000);
+    clearInterval(window._cdTick);
+    window._cdTick=setInterval(tickCds,1000);
+
+    // Realtime updates: re-render when any giveaway changes
+    if(window._discUnsub) window._discUnsub();
+    window._discUnsub = onSnapshot(collection(db,"giveaways"), snap => {
+      allDraws=[];
+      let tp=0,tw=0;
+      snap.forEach(d=>{const dw={id:d.id,...d.data()};allDraws.push(dw);if(!dw.isPrivate){tp+=(dw.partCount||0);tw+=(dw.winCount||0);}});
+      const live=allDraws.filter(d=>!d.isPrivate&&!(d.endTime&&new Date(d.endTime)<new Date())).length;
+      animCount("sA",live);animCount("sK",tp);animCount("sW",tw);animCount("sT",allDraws.filter(d=>!d.isPrivate).length);
+      renderDiscover();
+    });
   }catch(e){
+    dbgErr("loadDiscover:",e);
     let msg=e.message;
-    if(e.code==="permission-denied")msg="Firebase Firestore Rules hatası! Console → Firestore → Rules → allow read: if true; ekle.";
-    g.innerHTML='<div class="empty" style="grid-column:1/-1"><div class="empty-i">⚠️</div><div class="empty-t" style="color:var(--red)">'+msg+'</div></div>';
+    if(e.code==="permission-denied")msg="Firebase Firestore Rules hatası!\n\nFirebase Console → Firestore → Rules:\nallow read: if true;\nekleyin.";
+    else if(!navigator.onLine)msg="İnternet bağlantısı yok.";
+    g.innerHTML='<div class="empty" style="grid-column:1/-1"><div class="empty-i">⚠️</div><div class="empty-t" style="color:var(--red);white-space:pre-line">'+msg+'</div><button class="btn btn-ghost btn-sm" style="margin-top:12px" onclick="loadDiscover()">🔄 Tekrar Dene</button></div>';
   }
 }
 
+function animCount(id,target){
+  const el=document.getElementById(id);
+  if(!el)return;
+  const cur=parseInt(el.textContent?.replace(/[^0-9]/g,""))||0;
+  if(cur===target){return;}
+  if(target===0){el.textContent="0";return;}
+  const dur=1000,start=performance.now();
+  function step(now){
+    const p=Math.min((now-start)/dur,1);
+    const ease=1-Math.pow(1-p,4);
+    const val=Math.round(cur+(target-cur)*ease);
+    el.textContent=val>=1000?(val/1000).toFixed(1)+"K":val;
+    if(p<1)requestAnimationFrame(step);
+    else el.textContent=target>=1000?(target/1000).toFixed(1)+"K":target;
+  }
+  requestAnimationFrame(step);
+}
+
 function renderDiscover(){
-  const g=document.getElementById("discGrid");if(!g)return;g.innerHTML="";
+  const g=document.getElementById("discGrid");
+  if(!g)return;
+  g.innerHTML="";
   const medals=["🥇","🥈","🥉"];
-  const sq=searchQ.toLowerCase().trim();
+  const sq=(searchQ||"").toLowerCase().trim();
+  const now=new Date();
+
   let list=allDraws.filter(d=>{
     if(d.isPrivate)return false;
-    const ended=d.endTime&&new Date(d.endTime)<new Date();
+    const ended=d.endTime&&new Date(d.endTime)<now;
     if(curStatus==="live"&&ended)return false;
     if(curStatus==="end"&&!ended)return false;
     if(curCat!=="all"&&d.category!==curCat)return false;
-    if(sq){const n=(d.drawNameDisplay||d.drawName||"").toLowerCase();const cr=(d.creatorName||"").toLowerCase();const ds=(d.desc||"").toLowerCase();if(!n.includes(sq)&&!cr.includes(sq)&&!ds.includes(sq))return false;}
+    if(sq){
+      const n=(d.drawNameDisplay||d.drawName||"").toLowerCase();
+      const cr=(d.creatorName||"").toLowerCase();
+      const ds=(d.desc||"").toLowerCase();
+      if(!n.includes(sq)&&!cr.includes(sq)&&!ds.includes(sq))return false;
+    }
     return true;
   });
+
   if(curSort==="popular")list.sort((a,b)=>(b.partCount||0)-(a.partCount||0));
-  else if(curSort==="ending")list.sort((a,b)=>{if(!a.endTime)return 1;if(!b.endTime)return -1;return new Date(a.endTime)-new Date(b.endTime);});
+  else if(curSort==="ending")list.sort((a,b)=>{
+    if(!a.endTime)return 1;if(!b.endTime)return -1;
+    return new Date(a.endTime)-new Date(b.endTime);
+  });
   else list.sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
-  if(!list.length){g.innerHTML='<div class="empty" style="grid-column:1/-1"><div class="empty-i">🔍</div><div class="empty-t">Çekiliş bulunamadı.</div></div>';return;}
+
+  if(!list.length){
+    g.innerHTML='<div class="empty" style="grid-column:1/-1"><div class="empty-i">🔍</div><div class="empty-t">'+
+    (sq||curCat!=="all"?"Arama sonucu bulunamadı.<br><span style=\"cursor:pointer;color:var(--blu)\" onclick=\"resetFilters()\">Filtreleri temizle</span>":"Henüz aktif çekiliş yok.")+
+    '</div></div>';
+    return;
+  }
+
   list.forEach((dw,i)=>{
-    const ended=dw.endTime&&new Date(dw.endTime)<new Date();
+    const ended=dw.endTime&&new Date(dw.endTime)<now;
+    const ms=dw.endTime?new Date(dw.endTime)-now:Infinity;
     const cd=!ended&&dw.endTime?cdStr(dw.endTime):null;
+    const cdCls=ms<3600000?"cd-hot":ms<86400000?"cd-soon":"cd-ok";
     const maxP=dw.maxParticipants||0,pc=dw.partCount||0;
     const isFull=maxP>0&&pc>=maxP;
-    const timeLeft=dw.endTime?new Date(dw.endTime)-Date.now():Infinity;
-    const cdCls=timeLeft<3600000?"cd-hot":timeLeft<86400000?"cd-soon":"cd-ok";
-    const isHot=pc>=10,isNew=dw.createdAt&&(Date.now()-dw.createdAt.seconds*1000)<86400000;
-    const link=location.origin+location.pathname+"?g="+dw.id;
+    const isHot=pc>=10&&!ended;
+    const isNew=!isHot&&dw.createdAt&&(Date.now()-dw.createdAt.seconds*1000)<86400000&&!ended;
     const prizes=(dw.prizes||[]).slice(0,2);
-    const el=document.createElement("div");el.className="gc lift card";el.style.animationDelay=(i*.04)+"s";
+    const link=location.origin+location.pathname+"?g="+dw.id;
+
+    const el=document.createElement("div");
+    el.className="gc lift card";
+    el.style.animationDelay=(i*0.05)+"s";
+
+    // Build badges
     let bdgs="";
-    if(isHot&&!ended)bdgs+='<span class="bdg bdg-hot">🔥 Popüler</span>';
-    if(isNew&&!isHot&&!ended)bdgs+='<span class="bdg bdg-new">✨ Yeni</span>';
-    el.innerHTML=safeImg(dw,140)+
-    '<div class="card-body">'+
-      '<div class="card-top">'+
-        '<div style="display:flex;align-items:center;gap:7px">'+
-          '<div class="card-ava prBtn" data-uid="'+(dw.creatorId||"")+'">'+(dw.creatorName||"?")[0].toUpperCase()+'</div>'+
-          '<div><div class="card-cn prBtn" data-uid="'+(dw.creatorId||"")+'">'+(dw.creatorName||"").replace(/_/g," ")+'</div>'+
-          '<div class="card-cat">'+(dw.category||"")+'</div></div>'+
+    if(isHot)bdgs+='<span class="bdg bdg-hot">🔥 Popüler</span>';
+    if(isNew)bdgs+='<span class="bdg bdg-new">✨ Yeni</span>';
+    if(dw.isPrivate)bdgs+='<span class="bdg bdg-prv">🔒 Özel</span>';
+    if(isFull)bdgs+='<span class="bdg bdg-end">🔒 Dolu</span>';
+
+    // Progress bar html
+    const progHtml=maxP>0?'<div class="card-prog"><div class="card-prog-fill" style="width:'+Math.min(100,Math.round(pc/maxP*100))+'%"></div></div>':"";
+
+    // Prizes html
+    const prizesHtml=prizes.length?'<div class="card-prizes">'+prizes.map((p,j)=>'<div class="card-prize"><span>'+medals[j]+'</span>'+escHtml(p)+'</div>').join("")+'</div>':"";
+
+    // Countdown html
+    const cdHtml=cd?'<div class="card-cd '+cdCls+'" data-end="'+(dw.endTime||"")+'">⏳ <span class="cdt">'+cd+'</span></div>':"";
+
+    // Action btn
+    const actHtml=ended
+      ?'<span style="font-size:10px;color:var(--t3)">Bitti</span>'
+      :isFull
+      ?'<span style="font-size:10px;color:var(--ora)">Dolu</span>'
+      :'<button class="btn btn-fire btn-sm jbtn" data-id="'+dw.id+'" style="font-size:11px">Katıl →</button>';
+
+    el.innerHTML=
+      safeImg(dw,140)+
+      '<div class="card-body">'+
+        '<div class="card-top">'+
+          '<div style="display:flex;align-items:center;gap:7px">'+
+            '<div class="card-ava prBtn" data-uid="'+(dw.creatorId||"")+'">'+(dw.creatorName||"?")[0].toUpperCase()+'</div>'+
+            '<div>'+
+              '<div class="card-cn prBtn" data-uid="'+(dw.creatorId||"")+'">'+(dw.creatorName||"").replace(/_/g," ")+'</div>'+
+              '<div class="card-cat">'+(dw.category||"genel")+'</div>'+
+            '</div>'+
+          '</div>'+
+          '<span class="bdg '+(ended?"bdg-end":"bdg-live")+'">'+(ended?"Bitti":"● Aktif")+'</span>'+
         '</div>'+
-        '<span class="bdg '+(ended?"bdg-end":"bdg-live")+'">'+(ended?"Bitti":"● Aktif")+'</span>'+
-      '</div>'+
-      (bdgs?'<div class="card-bdgs">'+bdgs+'</div>':"")+
-      '<div class="card-name">'+(dw.drawNameDisplay||dw.drawName||"").replace(/_/g," ")+'</div>'+
-      (dw.desc?'<div class="card-desc">'+dw.desc+'</div>':"")+
-      (prizes.length?'<div class="card-prizes">'+prizes.map((p,j)=>'<div class="card-prize"><span>'+medals[j]+'</span>'+p+'</div>').join("")+'</div>':"")+
-      (maxP>0?'<div class="card-prog"><div class="card-prog-fill" style="width:'+Math.min(100,Math.round(pc/maxP*100))+'%"></div></div>':"")+
-      '<div class="card-footer">'+
-        '<div class="card-cnt">👥 <b>'+pc+'</b>'+(maxP>0?"/"+maxP:"")+'</div>'+
-        (cd?'<div class="card-cd '+cdCls+'" data-end="'+(dw.endTime||"")+'">⏳ <span class="cdt">'+cd+'</span></div>':"")+
-        '<div class="card-btns">'+
-          '<button class="btn btn-ghost btn-sm cpl" data-id="'+dw.id+'" style="padding:5px 8px">📋</button>'+
-          (!ended&&!isFull?'<button class="btn btn-fire btn-sm jbtn" data-id="'+dw.id+'" style="font-size:11px">Katıl →</button>':'<span style="font-size:10px;color:var(--t3);padding:5px 8px">'+(isFull?"Dolu":"Bitti")+'</span>')+
+        (bdgs?'<div class="card-bdgs">'+bdgs+'</div>':"")+
+        '<div class="card-name">'+escHtml((dw.drawNameDisplay||dw.drawName||"").replace(/_/g," "))+'</div>'+
+        (dw.desc?'<div class="card-desc">'+escHtml(dw.desc)+'</div>':"")+
+        prizesHtml+
+        progHtml+
+        '<div class="card-footer">'+
+          '<div class="card-cnt">👥 <b>'+pc+'</b>'+(maxP>0?' / '+maxP+" kişi":"")+'</div>'+
+          cdHtml+
+          '<div class="card-btns">'+
+            '<button class="btn btn-ghost btn-sm cpl" data-id="'+dw.id+'" style="padding:5px 8px" title="Linki kopyala">📋</button>'+
+            actHtml+
+          '</div>'+
         '</div>'+
-      '</div>'+
-    '</div>';
+      '</div>';
+
     g.appendChild(el);
   });
-  g.querySelectorAll(".prBtn").forEach(e=>e.addEventListener("click",()=>{if(e.dataset.uid)window.open(location.origin+location.pathname+"?p="+e.dataset.uid,"_blank");}));
-  g.querySelectorAll(".jbtn").forEach(e=>e.addEventListener("click",()=>window.open(location.origin+location.pathname+"?g="+e.dataset.id,"_blank")));
-  g.querySelectorAll(".cpl").forEach(e=>e.addEventListener("click",ev=>{ev.stopPropagation();navigator.clipboard.writeText(location.origin+location.pathname+"?g="+e.dataset.id).then(()=>toast("Link kopyalandı!","ok"));}));
+
+  // Event delegation
+  g.querySelectorAll(".prBtn").forEach(e=>e.addEventListener("click",()=>{
+    if(e.dataset.uid)window.open(location.origin+location.pathname+"?p="+e.dataset.uid,"_blank");
+  }));
+  g.querySelectorAll(".jbtn").forEach(e=>e.addEventListener("click",()=>{
+    window.open(location.origin+location.pathname+"?g="+e.dataset.id,"_blank");
+  }));
+  g.querySelectorAll(".cpl").forEach(e=>e.addEventListener("click",ev=>{
+    ev.stopPropagation();
+    const url=location.origin+location.pathname+"?g="+e.dataset.id;
+    navigator.clipboard.writeText(url).then(()=>toast("Link kopyalandı!","ok")).catch(()=>{
+      // Fallback for mobile
+      const ta=document.createElement("textarea");ta.value=url;ta.style.position="fixed";ta.style.opacity="0";document.body.appendChild(ta);ta.focus();ta.select();try{document.execCommand("copy");toast("Link kopyalandı!","ok");}catch(err){}document.body.removeChild(ta);
+    });
+  }));
 }
 
-function tickCds(){document.querySelectorAll(".card-cd[data-end]").forEach(el=>{const d=new Date(el.dataset.end)-Date.now();const sp=el.querySelector(".cdt");if(!sp)return;if(d<=0){sp.textContent="Bitti";el.className="card-cd cd-hot";return;}const D=Math.floor(d/86400000),h=Math.floor(d/3600000)%24,m=Math.floor(d%3600000/60000),s=Math.floor(d%60000/1000);sp.textContent=D>0?D+"g "+h+"s":h>0?h+"s "+m+"dk":(m<10?"0":"")+m+":"+(s<10?"0":"")+s;el.className="card-cd "+(d<3600000?"cd-hot":d<86400000?"cd-soon":"cd-ok");});}
+function escHtml(s){return(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
 
-// Discover controls
-document.getElementById("discSearch")?.addEventListener("input",debounce(function(){searchQ=this.value.trim();document.getElementById("discClr")?.classList.toggle("on",!!searchQ);renderDiscover();},250));
-document.getElementById("discClr")?.addEventListener("click",()=>{const s=document.getElementById("discSearch");if(s)s.value="";searchQ="";document.getElementById("discClr")?.classList.remove("on");renderDiscover();});
-document.querySelectorAll(".cat").forEach(c=>c.addEventListener("click",()=>{document.querySelectorAll(".cat").forEach(x=>x.classList.remove("on"));c.classList.add("on");curCat=c.dataset.c;renderDiscover();}));
-document.getElementById("discSort")?.addEventListener("change",e=>{curSort=e.target.value;renderDiscover();});
+function resetFilters(){
+  searchQ="";curCat="all";curStatus="all";curSort="new";
+  const si=document.getElementById("discSearch");if(si)si.value="";
+  const clr=document.getElementById("discClr");if(clr)clr.classList.remove("on");
+  document.querySelectorAll(".cat").forEach(c=>c.classList.toggle("on",c.dataset.c==="all"));
+  const ss=document.getElementById("discSort");if(ss)ss.value="new";
+  const dst=document.getElementById("discStatus");if(dst)dst.value="all";
+  renderDiscover();
+}
+
+function tickCds(){
+  document.querySelectorAll(".card-cd[data-end]").forEach(el=>{
+    const ms=new Date(el.dataset.end)-Date.now();
+    const sp=el.querySelector(".cdt");
+    if(!sp)return;
+    if(ms<=0){sp.textContent="Bitti";el.className="card-cd cd-hot";return;}
+    const D=Math.floor(ms/86400000),h=Math.floor(ms/3600000)%24,m=Math.floor(ms%3600000/60000),sc=Math.floor(ms%60000/1000);
+    sp.textContent=D>0?D+"g "+h+"s":h>0?h+"s "+m+"dk":(m<10?"0":"")+m+":"+(sc<10?"0":"")+sc;
+    el.className="card-cd "+(ms<3600000?"cd-hot":ms<86400000?"cd-soon":"cd-ok");
+  });
+}
+
 document.getElementById("discStatus")?.addEventListener("change",e=>{curStatus=e.target.value;renderDiscover();});
 setInterval(()=>{if(document.getElementById("pgD")?.classList.contains("on"))loadDiscover();},60000);
 
@@ -1537,10 +1684,21 @@ async function initPP(){
     sb.style.display="block";
     const btns=document.getElementById("ppShareBtns");
     if(btns){
-      [["💬 WA",()=>window.open("https://wa.me/?text="+encodeURIComponent(location.href),"_blank")],
-       ["📋 Link",()=>navigator.clipboard.writeText(location.href).then(()=>toast("Kopyalandı!","ok"))],
-       ["✈️ TG",()=>window.open("https://t.me/share/url?url="+encodeURIComponent(location.href),"_blank")]
-      ].forEach(([t,fn])=>{const b=document.createElement("button");b.className="btn btn-ghost btn-sm";b.textContent=t;b.onclick=fn;btns.appendChild(b);});
+      const shareItems=[
+        ["💬 WA",()=>window.open("https://wa.me/?text="+encodeURIComponent(location.href),"_blank")],
+        ["📋 Link",()=>{
+          if(navigator.share){navigator.share({title:document.title,url:location.href}).catch(()=>{});}
+          else{navigator.clipboard.writeText(location.href).then(()=>toast("Kopyalandı!","ok")).catch(()=>{const ta=document.createElement("textarea");ta.value=location.href;document.body.appendChild(ta);ta.select();document.execCommand("copy");document.body.removeChild(ta);toast("Kopyalandı!","ok");});}
+        }],
+        ["✈️ TG",()=>window.open("https://t.me/share/url?url="+encodeURIComponent(location.href),"_blank")]
+      ];
+      if(navigator.share){
+        const sb=document.createElement("button");sb.className="btn btn-fire btn-sm";sb.textContent="📤 Paylaş";
+        sb.onclick=()=>navigator.share({title:document.title,url:location.href}).catch(()=>{});
+        btns.appendChild(sb);
+      } else {
+        shareItems.forEach(([t,fn])=>{const b=document.createElement("button");b.className="btn btn-ghost btn-sm";b.textContent=t;b.onclick=fn;btns.appendChild(b);});
+      }
     }
     makeQR(document.getElementById("ppQR"),location.href,110);
   }
@@ -1555,6 +1713,13 @@ async function initPP(){
   if(ppUnsub){ppUnsub();ppUnsub=null;}
   ppUnsub=onSnapshot(collection(db,"giveaways/"+drawId+"/participants"),snap=>{
     const maxP=window._pp?.maxP||0,cnt=snap.size;
+    // Live ticker: show latest joiner
+    let latest=null;let latestTime=0;
+    snap.forEach(d=>{const dt=d.data();const ts=dt.timestamp?.seconds||0;if(ts>latestTime&&!dt.isWinner){latestTime=ts;latest=dt;}});
+    if(latest&&latestTime>0&&(Date.now()/1000-latestTime)<120){
+      const ticker=document.getElementById("ppTicker");
+      if(ticker){ticker.textContent="🟢 "+((latest.name||"").split(" ")[0]||"Biri")+" az önce katıldı!";ticker.style.display="block";}
+    }
     const ce=document.getElementById("ppCnt");if(ce)ce.textContent=maxP>0?cnt+"/"+maxP:cnt;
     if(maxP>0){const bar=document.getElementById("ppPBar");if(bar)bar.style.width=Math.min(100,Math.round(cnt/maxP*100))+"%";const lft=document.getElementById("ppPLeft");if(lft)lft.textContent=cnt+" katılımcı";}
     if(cnt>=5){const sp=document.getElementById("ppSP");if(sp){sp.style.display="block";sp.textContent="🟢 "+cnt+" kişi katıldı!";}}
@@ -1711,7 +1876,7 @@ document.getElementById("suppClose")?.addEventListener("click",()=>document.getE
 document.getElementById("suppOv")?.addEventListener("click",e=>{if(e.target===document.getElementById("suppOv"))document.getElementById("suppOv")?.classList.remove("on");});
 
 // ── MANAGER ──
-let mgrId="",mgrPrizess=[],mgrData={},mgrUnsub=null,allPts=[],mgrParts=[],selParts=new Set();
+let mgrId="",mgrPrizess=[],mgrData={},mgrUnsub=null,allPts=[],mgrParts=[],selParts=new Set(),slotSpeed=5000;
 
 async function openMgr(drawId,drawName,prizes){
   mgrId=drawId;mgrPrizess=prizes;allPts=[];mgrParts=[];selParts.clear();
@@ -1805,15 +1970,15 @@ function runSlot(parts,prize,prizeIdx){
   items.push(winner.name||"?");
   items.forEach(n=>{const d=document.createElement("div");d.className="slot-item";d.textContent=n;reel.appendChild(d);});
   const dur=slotSpeed,start=Date.now();
-  function ease(t){return t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;}
-  function frame(){
-    const elapsed=Date.now()-start,progress=Math.min(elapsed/dur,1),eased=ease(progress);
+  function slotEase(t){return t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;}
+  function slotFrame(){
+    const elapsed=Date.now()-start,progress=Math.min(elapsed/dur,1),eased=slotEase(progress);
     const targetIdx=items.length-1;const curIdx=Math.floor(eased*targetIdx);
     document.querySelectorAll(".slot-item").forEach((el,i)=>el.classList.toggle("on",i===curIdx));
     reel.style.transform="translateY(-"+(curIdx*46)+"px)";
     document.getElementById("slotBar").style.width=(eased*100)+"%";
     document.getElementById("slotSt").textContent=progress<.5?"Hızlanıyor...":progress<.9?"Yavaşlıyor...":"Duruyor...";
-    if(progress<1){requestAnimationFrame(frame);}
+    if(progress<1){requestAnimationFrame(slotFrame);}
     else{
       // Show winner
       setTimeout(async()=>{
@@ -1836,7 +2001,7 @@ function runSlot(parts,prize,prizeIdx){
       },400);
     }
   }
-  requestAnimationFrame(frame);
+  requestAnimationFrame(slotFrame);
 }
 
 function sendWinnerEmail(winner,prize){
@@ -1890,14 +2055,14 @@ function runLiveSlot(prize,prizeIdx){
   items.forEach(n=>{const d=document.createElement("div");d.className="live-item";d.textContent=n;reel.appendChild(d);});
   const dur=slotSpeed,start=Date.now();
   const pb=document.getElementById("livePB");
-  function ease(t){return t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;}
-  function frame(){
-    const elapsed=Date.now()-start,progress=Math.min(elapsed/dur,1),eased=ease(progress);
+  function liveEase(t){return t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;}
+  function liveFrame(){
+    const elapsed=Date.now()-start,progress=Math.min(elapsed/dur,1),eased=liveEase(progress);
     const targetIdx=items.length-1,curIdx=Math.floor(eased*targetIdx);
     document.querySelectorAll(".live-item").forEach((el,i)=>el.classList.toggle("on",i===curIdx));
     reel.style.transform="translateY(-"+(curIdx*64)+"px)";
     if(pb)pb.style.width=(eased*100)+"%";
-    if(progress<1){requestAnimationFrame(frame);}
+    if(progress<1){requestAnimationFrame(liveFrame);}
     else{
       setTimeout(async()=>{
         document.getElementById("liveWN").textContent=winner.name||"?";
@@ -1912,8 +2077,9 @@ function runLiveSlot(prize,prizeIdx){
       },500);
     }
   }
-  requestAnimationFrame(frame);
+  requestAnimationFrame(liveFrame);
 }
 </script>
+<button id="topBtn" onclick="window.scrollTo({top:0,behavior:'smooth'})" style="position:fixed;bottom:max(70px,calc(var(--safe-bot)+60px));right:12px;z-index:190;width:38px;height:38px;border-radius:50%;background:var(--card2);border:1px solid var(--border2);color:var(--t2);font-size:16px;cursor:pointer;display:none;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,.4);transition:all .2s">↑</button>
 </body>
 </html>
