@@ -1142,7 +1142,7 @@ imgArea.addEventListener("dragleave",()=>imgArea.classList.remove("drag"));
 imgArea.addEventListener("drop",e=>{e.preventDefault();imgArea.classList.remove("drag");if(e.dataTransfer.files[0]){imgFile.files=e.dataTransfer.files;imgFile.dispatchEvent(new Event("change"));}});
 
 // ── DISCOVER ──
-let allDraws=[],curFilter="all";
+let allDraws=[],curFilter="all",curCat="all",curSort="new",searchQ="";
 async function loadDiscover(){
   const g=document.getElementById("discGrid");
   g.innerHTML='<div class="empty"><span class="spin"></span></div>';
@@ -2350,6 +2350,7 @@ function wireJoin(drawId, lsKey, dw){
   btn._wired = true;
 
   btn.addEventListener("click", async () => {
+    console.log("[JOIN CLICK] fired");
     // Honeypot bot check
     if(document.getElementById("ppHp")?.value) return;
 
@@ -2467,6 +2468,8 @@ function wireJoin(drawId, lsKey, dw){
       if(e.code==="permission-denied") msg = "Firebase izin hatası!\n\nFirebase Console > Firestore > Rules sekmesine git ve:\nallow read, write: if true;\nekle (test için).";
       if(e.code==="unavailable") msg = "İnternet bağlantısı yok.";
       toast("Katılım hatası: "+msg,"err");
+      console.error("JOIN ERROR:",e.code,e.message);
+      setTimeout(()=>alert("Katılım başarısız!\nHata: "+msg+"\n\nFirebase Console→Firestore→Rules→\nallow read,write:if true;\nekle"),200);
       resetBtn();
     }
   });
