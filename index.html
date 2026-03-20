@@ -1205,16 +1205,16 @@ function renderDiscover(){
         '<div class="card-footer">'+
           '<div class="card-cnt">👥 <b>'+(dw.partCount||0)+'</b></div>'+
           (cd?'<div class="cd-timer" data-end="'+dw.endTime+'">⏳ <span class="cdt">'+cd+'</span></div>':"")+
-          (!ended?'<button class="btn fire sm" data-c="'+dw.creatorName+'" data-g="'+dw.drawName+'">Katil →</button>':'<span style="font-size:10px;color:var(--t3)">Bitti</span>')+
-          '<button class="btn ghost sm cpl-btn" data-c="'+dw.creatorName+'" data-g="'+dw.drawName+'" style="padding:5px 7px;font-size:11px">📋</button>'+
+          (!ended?'<button class="btn fire sm" data-id="'+dw.id+'">Katıl →</button>':'<span style="font-size:10px;color:var(--t3)">Bitti</span>')+
+          '<button class="btn ghost sm cpl-btn" data-id="'+dw.id+'" style="padding:5px 7px;font-size:11px">📋</button>'+
         '</div>'+
       '</div>';
     g.appendChild(el);
   });
   // Event delegation
   g.querySelectorAll("[data-pr]").forEach(el=>el.addEventListener("click",()=>window.open(location.origin+location.pathname+"?p="+el.dataset.pr,"_blank")));
-  g.querySelectorAll("[data-c]:not(.cpl-btn)").forEach(el=>el.addEventListener("click",()=>window.open(location.origin+location.pathname+"?c="+el.dataset.c+"&g="+el.dataset.g,"_blank")));
-  g.querySelectorAll(".cpl-btn").forEach(el=>el.addEventListener("click",e=>{e.stopPropagation();const u=location.origin+location.pathname+"?c="+el.dataset.c+"&g="+el.dataset.g;navigator.clipboard.writeText(u);toast("Link kopyalandi!");}));
+  g.querySelectorAll("[data-id]:not(.cpl-btn)").forEach(el=>el.addEventListener("click",()=>window.open(location.origin+location.pathname+"?g="+el.dataset.id,"_blank")));
+  g.querySelectorAll(".cpl-btn").forEach(el=>el.addEventListener("click",e=>{e.stopPropagation();const u=location.origin+location.pathname+"?g="+el.dataset.id;navigator.clipboard.writeText(u);toast("Link kopyalandı!");}));
 }
 
 // Live countdown ticker
@@ -1266,12 +1266,12 @@ async function loadProfile(cn){
           (prizes?'<div class="card-prizes">'+prizes+'</div>':"")+
           '<div class="card-footer">'+
             '<div class="card-cnt">👥 <b>'+(dw.partCount||0)+'</b></div>'+
-            (!ended&&!dw.isPrivate?'<button class="btn fire sm" data-c="'+dw.creatorName+'" data-g="'+dw.drawName+'">Katil →</button>':"")+
+            (!ended&&!dw.isPrivate?'<button class="btn fire sm" data-id="'+dw.id+'">Katıl →</button>':"")+
           '</div>'+
         '</div>';
       g.appendChild(el);
     });
-    g.querySelectorAll("[data-c]").forEach(el=>el.addEventListener("click",()=>window.open(location.origin+location.pathname+"?c="+el.dataset.c+"&g="+el.dataset.g,"_blank")));
+    g.querySelectorAll("[data-id]:not(.cpl-btn)").forEach(el=>el.addEventListener("click",()=>window.open(location.origin+location.pathname+"?g="+el.dataset.id,"_blank")));
   }catch(e){g.innerHTML='<div class="empty"><div class="empty-t" style="color:var(--red)">'+e.message+'</div></div>';}
 }
 
@@ -1298,7 +1298,7 @@ async function loadDash(){
     g.innerHTML="";
     draws.forEach((dw,i)=>{
       const ended=dw.endTime&&new Date(dw.endTime)<new Date();
-      const link=location.origin+location.pathname+"?c="+dw.creatorName+"&g="+dw.drawName;
+      const link=location.origin+location.pathname+"?g="+dw.id;
       const el=document.createElement("div");el.className="gc hov my-card";el.style.animationDelay=(i*0.06)+"s";
       el.innerHTML=
         (dw.imageUrl&&dw.imageUrl.startsWith("http")?'<img class="my-img" src="'+dw.imageUrl+'" onerror="this.style.display=\'none\'">':'<div class="my-img-ph">🎁</div>')+
@@ -2083,7 +2083,11 @@ async function initPP(){
     window._pp.orgEmail = dw.organizerEmail || "";
   }catch(e){
     let msg = e.message;
-    if(e.code === "permission-denied") msg = "Erişim izni yok! Firebase Firestore kurallarını kontrol edin.";
+    if(e.code === "permission-denied")
+      msg = "Firebase Firestore erişim hatası!\n\nFirebase Console → Firestore → Rules sekmesine git ve şu kuralları ekle:\n\nallow read: if true;";
+    else if(!navigator.onLine)
+      msg = "İnternet bağlantısı yok.";
+    console.error("initPP error:", e.code, e.message);
     showError(msg);
     return;
   }
