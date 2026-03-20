@@ -13,7 +13,6 @@
 <link rel="manifest" href="/manifest.json">
 <link rel="apple-touch-icon" href="/icon-192.png">
 <title>Raffle</title>
-<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onloadTurnstileCallback" async defer></script>
 <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;700;900&family=Outfit:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -707,18 +706,7 @@ textarea.inp{resize:vertical}
       <div style="font-family:'Unbounded',sans-serif;font-size:14px;font-weight:700;margin-bottom:3px">Çekilişe Katıl</div>
       <div id="ppFormNote" style="font-size:11px;color:var(--t3);margin-bottom:12px">Sadece @gmail.com kabul edilir.</div>
 
-      <!-- Cloudflare Turnstile -->
-      <div id="ppTurnstileWrap" style="display:none;justify-content:center;margin-bottom:12px">
-        <div id="ppTurnstileWidget"
-          class="cf-turnstile"
-          data-sitekey="0x4AAAAAACswDRAnhAQR0tuJmCTSjgAM00E"
-          data-theme="auto"
-          data-callback="onCFDone"
-          data-expired-callback="onCFExp"
-          data-error-callback="onCFErr">
-        </div>
-      </div>
-      <div id="ppTurnstileNote" style="display:none;font-size:10px;color:var(--t3);text-align:center;margin-bottom:8px">✅ Doğrulama tamamlandı</div>
+
 
       <!-- Math captcha fallback -->
       <div id="ppMathBox" style="display:none;background:rgba(255,214,10,.06);border:1px solid rgba(255,214,10,.2);border-radius:9px;padding:9px 12px;margin-bottom:12px">
@@ -994,7 +982,8 @@ function safeImg(dw,h){
 // ── URL PARAMS ──
 const QS=new URLSearchParams(location.search);
 const urlC=QS.get("c"),urlG=QS.get("g"),urlP=QS.get("p");
-const isPart=!!(urlC&&urlG),isProf=!!urlP;
+// isPart: new format ?g=autoId  OR  legacy ?c=creator&g=name
+const isPart=!!urlG,isProf=!!urlP&&!urlG;
 
 // ── ROUTER ──
 function go(id){
@@ -2199,14 +2188,7 @@ async function initPP(){
     if(qrCnv) makeQR(qrCnv, location.href, 100);
   }
 
-  // Cloudflare Turnstile - show widget
-  const tsWrap = document.getElementById("ppTurnstileWrap");
-  if(tsWrap){
-    tsWrap.style.display = "flex";
-    if(typeof turnstile !== "undefined"){
-      try{ turnstile.render("#ppTurnstileWidget"); }catch(e){}
-    }
-  }
+
 
   // Math captcha
   if(dw.captchaEnabled){
@@ -2308,8 +2290,6 @@ async function initPP(){
     document.getElementById("ppEmail").value = "";
     document.getElementById("ppInsta").value = "";
     document.getElementById("ppName").focus();
-    if(typeof turnstile !== "undefined"){ try{ turnstile.reset(); }catch(e){} }
-    window._pp.cfToken = null;
   });
 }
 
@@ -2343,14 +2323,7 @@ function wireJoin(drawId, lsKey, dw){
     // Honeypot
     if(document.getElementById("ppHp")?.value){ return; }
 
-    // Turnstile token check
-    const cfToken = window._pp?.cfToken || null;
-    const isLocal = ["localhost","127.0.0.1"].includes(location.hostname) || location.hostname.startsWith("192.168");
-    if(!cfToken && !isLocal){
-      toast("Lütfen robot doğrulamasını tamamlayın!","warn");
-      document.getElementById("ppTurnstileWrap")?.scrollIntoView({behavior:"smooth",block:"center"});
-      return;
-    }
+
 
     // Math captcha
     if(window._pp?.mathAnswer !== undefined){
@@ -2481,8 +2454,6 @@ function wireCancel(drawId, lsKey){
           await updateDoc(doc(db,"giveaways",drawId),{partCount:increment(-1)});
         localStorage.removeItem(lsKey);
         window._pp.joinedEmail = "";
-        window._pp.cfToken = null;
-        if(typeof turnstile!=="undefined"){try{turnstile.reset();}catch(e){}}
         showState("form");
         ["ppName","ppInsta"].forEach(id=>{const el=document.getElementById(id);if(el)el.value="";});
         const emailEl = document.getElementById("ppEmail");
@@ -2719,44 +2690,7 @@ document.getElementById("pushTog")?.addEventListener("change",async e=>{
 });
 
 // ── Cloudflare Turnstile callbacks (global) ──
-// New Turnstile widget callback
-window.onCFDone=function(token){
-  if(window._pp) window._pp.cfToken = token;
-  const note = document.getElementById("ppTurnstileNote");
-  if(note) note.style.display = "block";
-  const wrap = document.getElementById("ppTurnstileWrap");
-  if(wrap) wrap.style.outline = "2px solid var(--grn)";
-};
-window.onCFExp=function(){
-  if(window._pp) window._pp.cfToken = null;
-  const note = document.getElementById("ppTurnstileNote");
-  if(note) note.style.display = "none";
-  const wrap = document.getElementById("ppTurnstileWrap");
-  if(wrap) wrap.style.outline = "";
-};
-window.onCFErr=function(){
-  if(window._pp) window._pp.cfToken = null;
-  toast("Turnstile hatası, yenileniyor...","warn");
-};
-// Legacy callback (keep for backward compat)
-window.onTurnstileDone=function(token){
-  window._cfToken=token;
-  // Visual feedback
-  const cfW=document.getElementById("cfWrap");
-  if(cfW)cfW.style.outline="2px solid var(--grn)";
-};
-window.onTurnstileExp=function(){
-  window._cfToken=null;
-  const cfW=document.getElementById("cfWrap");
-  if(cfW)cfW.style.outline="";
-};
-// Render Turnstile when script loads
-window.onloadTurnstileCallback=function(){
-  const cfW=document.getElementById("cfWrap");
-  if(cfW&&cfW.style.display!=="none"){
-    try{turnstile.render("#cfWidget");}catch(e){}
-  }
-};
+
 </script>
 </body>
 </html>
