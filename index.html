@@ -13,7 +13,7 @@
 <link rel="manifest" href="/manifest.json">
 <link rel="apple-touch-icon" href="/icon-192.png">
 <title>Raffle</title>
-<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onloadTurnstileCallback" async defer></script>
 <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;700;900&family=Outfit:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -659,8 +659,14 @@ textarea.inp{resize:vertical}
       <div class="pp-form-title">Cekilise Katil</div>
       <div class="pp-form-sub" id="ppFormSub">Sadece @gmail.com kabul edilir.</div>
       <!-- Cloudflare Turnstile -->
-      <div id="cfWrap" style="margin-bottom:12px;display:flex;justify-content:center;display:none">
-        <div class="cf-turnstile" id="cfWidget" data-sitekey="0x4AAAAAACswDRAnhAQR0tuJmCTSjgAM00E" data-theme="dark" data-size="normal"></div>
+      <div id="cfWrap" style="margin-bottom:12px;justify-content:center;display:none">
+        <div class="cf-turnstile" id="cfWidget"
+          data-sitekey="0x4AAAAAACswDRAnhAQR0tuJmCTSjgAM00E"
+          data-theme="auto"
+          data-size="normal"
+          data-callback="onTurnstileDone"
+          data-expired-callback="onTurnstileExp">
+        </div>
       </div>
       <!-- Math Captcha (backup) -->
       <div class="captcha-box" id="ppCaptchaBox" style="display:none">
@@ -2059,8 +2065,11 @@ async function initPP(){
       }
 
       // Show Cloudflare Turnstile
-      const cfW=document.getElementById("cfWrap");
-      if(cfW)cfW.style.display="flex";
+      const cfWEl=document.getElementById("cfWrap");
+      if(cfWEl){
+        cfWEl.style.display="flex";
+        if(typeof turnstile!=="undefined"){try{turnstile.render("#cfWidget");}catch(e){}}
+      }
       // Math captcha if enabled
       if(dw.captchaEnabled){
         const cb=document.getElementById("ppCaptchaBox");if(cb)cb.style.display="block";
@@ -2112,8 +2121,15 @@ async function initPP(){
         if(qrC)genQR(qrC,location.href,100);
       }
       // Cloudflare Turnstile - show widget
+      // Show Turnstile widget
       const cfW2=document.getElementById("cfWrap");
-      if(cfW2)cfW2.style.display="flex";
+      if(cfW2){
+        cfW2.style.display="flex";
+        // If Turnstile already loaded, re-render
+        if(typeof turnstile!=="undefined"){
+          try{turnstile.render("#cfWidget");}catch(e){}
+        }
+      }
       // Math captcha if enabled
       if(dw.captchaEnabled){
         const cb=document.getElementById("ppCaptchaBox");
@@ -2194,9 +2210,12 @@ async function initPP(){
       // Honeypot bot check
       if(document.getElementById("ppHoney")?.value){console.warn("Bot detected");return;}
       // Cloudflare Turnstile check
-      const cfToken=typeof turnstile!=="undefined"?turnstile.getResponse(document.getElementById("cfWidget")):null;
-      if(!cfToken&&location.hostname!=="localhost"&&!location.hostname.startsWith("192.168")){
-        toast("Lütfen güvenlik doğrulamasını tamamlayın (robot değilim)!","warn");
+      const cfToken=window._cfToken||null;
+      const isLocal=location.hostname==="localhost"||location.hostname.startsWith("192.168")||location.hostname.startsWith("127.");
+      if(!cfToken&&!isLocal){
+        toast("Lütfen 'Ben robot değilim' kutucuğunu işaretleyin!","warn");
+        // Scroll to turnstile
+        document.getElementById("cfWrap")?.scrollIntoView({behavior:"smooth",block:"center"});
         return;
       }
       // Math captcha check
@@ -2238,8 +2257,8 @@ async function initPP(){
         const dup=await getDocs(qd);
         if(!dup.empty){
           localStorage.setItem(lsKey,"1");
-        // Reset Turnstile for potential re-use
-        if(typeof turnstile!=="undefined")try{turnstile.reset();}catch(e){}window._ppJoinedEmail=email;
+        window._cfToken=null;
+        if(typeof turnstile!=="undefined"){try{turnstile.reset();}catch(e){}}window._ppJoinedEmail=email;
           document.getElementById("ppFormCard").classList.add("hidden");
           document.getElementById("ppAlr").style.display="block";
           setupCancelAndSupport(drawId,lsKey,null);return;
@@ -2535,6 +2554,26 @@ if(!navigator.onLine){if(connDotEl)connDotEl.style.background="var(--red)";if(of
 document.getElementById("pushTog")?.addEventListener("change",async e=>{
   if(e.target.checked){const p=await Notification.requestPermission();e.target.checked=p==="granted";}
 });
+
+// ── Cloudflare Turnstile callbacks (global) ──
+window.onTurnstileDone=function(token){
+  window._cfToken=token;
+  // Visual feedback
+  const cfW=document.getElementById("cfWrap");
+  if(cfW)cfW.style.outline="2px solid var(--grn)";
+};
+window.onTurnstileExp=function(){
+  window._cfToken=null;
+  const cfW=document.getElementById("cfWrap");
+  if(cfW)cfW.style.outline="";
+};
+// Render Turnstile when script loads
+window.onloadTurnstileCallback=function(){
+  const cfW=document.getElementById("cfWrap");
+  if(cfW&&cfW.style.display!=="none"){
+    try{turnstile.render("#cfWidget");}catch(e){}
+  }
+};
 </script>
 </body>
 </html>
