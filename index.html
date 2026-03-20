@@ -1173,13 +1173,31 @@ function renderDiscover(){
   const g=document.getElementById("discGrid");
   g.innerHTML="";
   const medals=["🥇","🥈","🥉"];
-  const list=allDraws.filter(d=>{
+  const sq=(searchQ||"").toLowerCase().trim();
+  let list=allDraws.filter(d=>{
     if(d.isPrivate)return false;
     const ended=d.endTime&&new Date(d.endTime)<new Date();
-    if(curFilter==="live")return!ended;
-    if(curFilter==="end")return ended;
+    // Status filter
+    if(curFilter==="live"&&ended)return false;
+    if(curFilter==="end"&&!ended)return false;
+    // Category filter
+    if(curCat&&curCat!=="all"&&d.category!==curCat)return false;
+    // Search filter
+    if(sq){
+      const name=(d.drawNameDisplay||d.drawName||"").toLowerCase();
+      const creator=(d.creatorName||"").toLowerCase();
+      const desc=(d.desc||"").toLowerCase();
+      if(!name.includes(sq)&&!creator.includes(sq)&&!desc.includes(sq))return false;
+    }
     return true;
   });
+  // Sort
+  if(curSort==="popular")list.sort((a,b)=>(b.partCount||0)-(a.partCount||0));
+  else if(curSort==="ending")list.sort((a,b)=>{
+    if(!a.endTime)return 1;if(!b.endTime)return -1;
+    return new Date(a.endTime)-new Date(b.endTime);
+  });
+  else list.sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
   if(!list.length){g.innerHTML='<div class="empty" style="grid-column:1/-1"><div class="empty-i">🔍</div><div class="empty-t">Cekilis yok.</div></div>';return;}
   list.forEach((dw,i)=>{
     const ended=dw.endTime&&new Date(dw.endTime)<new Date();
@@ -1199,7 +1217,7 @@ function renderDiscover(){
           '</div>'+
           '<span class="bdg '+(ended?"end-bdg":"live-bdg")+'">'+(ended?"Bitti":"● Aktif")+'</span>'+
         '</div>'+
-        '<div class="card-name">'+(dw.drawName||"").replace(/_/g," ")+'</div>'+
+        '<div class="card-name">'+(dw.drawNameDisplay||dw.drawName||"").replace(/_/g," ")+'</div>'+
         (dw.desc?'<div class="card-desc">'+dw.desc+'</div>':"")+
         (priz?'<div class="card-prizes">'+priz+'</div>':"")+
         '<div class="card-footer">'+
@@ -1260,7 +1278,7 @@ async function loadProfile(cn){
       el.innerHTML=safeImg(dw,110)+
         '<div class="card-body">'+
           '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">'+
-            '<div class="card-name">'+(dw.drawName||"").replace(/_/g," ")+'</div>'+
+            '<div class="card-name">'+(dw.drawNameDisplay||dw.drawName||"").replace(/_/g," ")+'</div>'+
             '<span class="bdg '+(ended?"end-bdg":"live-bdg")+'">'+(ended?"Bitti":"Aktif")+'</span>'+
           '</div>'+
           (prizes?'<div class="card-prizes">'+prizes+'</div>':"")+
@@ -1304,7 +1322,7 @@ async function loadDash(){
         (dw.imageUrl&&dw.imageUrl.startsWith("http")?'<img class="my-img" src="'+dw.imageUrl+'" onerror="this.style.display=\'none\'">':'<div class="my-img-ph">🎁</div>')+
         '<div class="my-body">'+
           '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:2px">'+
-            '<div class="my-name">'+(dw.drawName||"").replace(/_/g," ")+'</div>'+
+            '<div class="my-name">'+(dw.drawNameDisplay||dw.drawName||"").replace(/_/g," ")+'</div>'+
             '<div style="display:flex;gap:3px;align-items:center">'+
               (dw.isPrivate?'<span class="bdg prv-bdg" style="font-size:9px">🔒</span>':"")+
               '<span class="bdg '+(ended?"end-bdg":"live-bdg")+'">'+(ended?"Bitti":"Aktif")+'</span>'+
@@ -2055,29 +2073,37 @@ let ppUnsub=null;
 
 async function initPP(){
   // ── Resolve drawId ──
-  // New format: ?g=autoId | Legacy: ?c=creator&g=name
-  let drawId = urlG || "";
-  if(urlC && urlG){
-    // Could be legacy: try combined key first
-    const legacyId = urlC + "_" + urlG;
+  const rawG = urlG || "";
+  const rawC = urlC || "";
+  console.log("[initPP] urlG:", rawG, "urlC:", rawC, "urlP:", urlP);
+  
+  let drawId = rawG;
+  
+  // Legacy support: ?c=creator&g=name
+  if(rawC && rawG){
+    const legacyId = rawC + "_" + rawG;
     try{
       const legacyDoc = await getDoc(doc(db,"giveaways",legacyId));
-      if(legacyDoc.exists()) drawId = legacyId;
-    }catch(e){}
+      if(legacyDoc.exists()){ drawId = legacyId; console.log("[initPP] legacy drawId:", drawId); }
+    }catch(e){ console.log("[initPP] legacy check error:", e.code); }
   }
+  
   if(!drawId){
     showError("Geçersiz link. Çekiliş bulunamadı.");
     return;
   }
 
+  console.log("[initPP] Final drawId:", drawId);
   const lsKey = "r_joined_" + drawId;
   window._pp = { drawId, lsKey, orgEmail:"", joinedEmail:"" };
 
   // ── Load draw data ──
   let dw;
   try{
+    console.log("[initPP] Fetching from Firestore...");
     const snap = await getDoc(doc(db,"giveaways",drawId));
-    if(!snap.exists()){ showError("Çekiliş bulunamadı!"); return; }
+    console.log("[initPP] snap.exists():", snap.exists());
+    if(!snap.exists()){ showError("Çekiliş bulunamadı! (ID: "+drawId+")"); return; }
     dw = { id:snap.id, ...snap.data() };
     window._pp.dw = dw;
     window._pp.orgEmail = dw.organizerEmail || "";
@@ -2324,67 +2350,79 @@ function wireJoin(drawId, lsKey, dw){
   btn._wired = true;
 
   btn.addEventListener("click", async () => {
-    // Honeypot
-    if(document.getElementById("ppHp")?.value){ return; }
+    // Honeypot bot check
+    if(document.getElementById("ppHp")?.value) return;
 
+    // Field validation - BEFORE disabling button
+    const name  = (document.getElementById("ppName")?.value  || "").trim();
+    const email = (document.getElementById("ppEmail")?.value || "").trim().toLowerCase();
+    const insta = (document.getElementById("ppInsta")?.value || "").trim();
 
+    if(!name){ toast("Ad Soyad zorunlu!","err"); return; }
+    if(name.split(/\s+/).length < 2){ toast("Ad ve Soyad girin (örn: Ahmet Yilmaz)","err"); return; }
+    if(!email){ toast("Gmail adresi zorunlu!","err"); return; }
+    if(!/^[a-zA-Z0-9._%+\-]+@gmail\.com$/.test(email)){ toast("Sadece @gmail.com kabul edilir!","err"); return; }
+
+    // Age check
+    if(document.getElementById("ppAgeConfirm")?.style.display !== "none"){
+      if(!document.getElementById("ppAgeChk")?.checked){ toast("18+ yaş onayı gerekli!","warn"); return; }
+    }
+    // Rules agree
+    if(!document.getElementById("ppAgreeChk")?.checked){ toast("Çekiliş koşullarını kabul etmelisiniz!","warn"); return; }
 
     // Math captcha
     if(window._pp?.mathAnswer !== undefined){
       const ans = parseInt(document.getElementById("ppMathAns")?.value || "");
-      if(isNaN(ans) || ans !== window._pp.mathAnswer){ toast("Yanlış captcha cevabı!","err"); return; }
+      if(isNaN(ans)||ans!==window._pp.mathAnswer){ toast("Yanlış captcha cevabı!","err"); return; }
     }
 
-    // Field validation
-    const name = document.getElementById("ppName")?.value.trim() || "";
-    const email = document.getElementById("ppEmail")?.value.trim().toLowerCase() || "";
-    const insta = document.getElementById("ppInsta")?.value.trim() || "";
-
-    if(!name){ toast("Ad Soyad zorunlu!","err"); return; }
-    if(name.split(/\s+/).length < 2){ toast("Ad ve Soyad girin (iki kelime)!","err"); return; }
-    if(!email){ toast("Gmail adresi zorunlu!","err"); return; }
-    if(!/^[a-zA-Z0-9._%+\-]+@gmail\.com$/.test(email)){ toast("Sadece @gmail.com kabul edilir!","err"); return; }
-
-    // Age
-    if(dw.ageRequired && !document.getElementById("ppAgeChk")?.checked){
-      toast("18+ yaş onayı gerekli!","warn"); return;
-    }
-    // Agree
-    if(!document.getElementById("ppAgreeChk")?.checked){
-      toast("Çekiliş koşullarını kabul etmelisiniz!","warn"); return;
-    }
-
+    // Disable button + show spinner
     btn.disabled = true;
     btn.innerHTML = '<span class="spin"></span>';
 
+    // Helper to reset button
+    const resetBtn = () => { btn.disabled=false; btn.innerHTML="🚀 Hemen Katıl"; };
+
     try{
-      // Re-check draw state
+      // Check draw still exists & not ended/full
       const dwFresh = await getDoc(doc(db,"giveaways",drawId));
-      if(!dwFresh.exists()){ toast("Çekiliş bulunamadı!","err"); return; }
+      if(!dwFresh.exists()){
+        toast("Çekiliş bulunamadı!","err");
+        resetBtn(); return;
+      }
       const dwData = dwFresh.data();
 
-      // Ended check
       if(dwData.endTime && new Date(dwData.endTime) < new Date()){
-        showState("ended"); return;
+        showState("ended");
+        resetBtn(); return;
       }
 
-      // Full check
       const maxP = dwData.maxParticipants || 0;
       if(maxP > 0 && (dwData.partCount||0) >= maxP){
-        toast("Bu çekiliş doldu! (Max " + maxP + " kişi)","err");
-        btn.disabled=false; btn.innerHTML="🚀 Hemen Katıl"; return;
+        toast("Bu çekiliş doldu! (Max "+maxP+" kişi)","err");
+        resetBtn(); return;
       }
 
       // Duplicate email check
-      const dupSnap = await getDocs(query(
-        collection(db,"giveaways/"+drawId+"/participants"),
-        where("email","==",email)
-      ));
-      if(!dupSnap.empty){
+      // NOTE: If Firestore Rules block read on participants, skip this check
+      // and let addDoc fail with duplicate key error instead
+      let isDup = false;
+      try{
+        const dupSnap = await getDocs(query(
+          collection(db,"giveaways/"+drawId+"/participants"),
+          where("email","==",email)
+        ));
+        isDup = !dupSnap.empty;
+      }catch(dupErr){
+        // Permission denied on read - skip dup check, addDoc will handle it
+        console.warn("dup check skipped:", dupErr.code);
+      }
+
+      if(isDup){
         localStorage.setItem(lsKey,"1");
         window._pp.joinedEmail = email;
         showState("already");
-        return;
+        resetBtn(); return;
       }
 
       // Add participant
@@ -2393,40 +2431,43 @@ function wireJoin(drawId, lsKey, dw){
         isWinner:false,
         timestamp: serverTimestamp()
       });
+
+      // Increment counter
       await updateDoc(doc(db,"giveaways",drawId),{ partCount: increment(1) });
 
+      // Save locally
       localStorage.setItem(lsKey,"1");
       window._pp.joinedEmail = email;
 
-      // Success state
+      // Show success
       showState("success");
 
-      // Rank
+      // Rank text
       const rankEl = document.getElementById("ppSuccessRank");
-      if(rankEl) rankEl.textContent = (dwData.partCount||0) + 1 + ". katılımcı oldun!";
+      if(rankEl) rankEl.textContent = ((dwData.partCount||0)+1)+". katılımcı oldun! 🎉";
 
-      // Share buttons in success
+      // Share buttons
       const shareEl = document.getElementById("ppSuccessShare");
-      if(shareEl){
-        const waB = document.createElement("button"); waB.className="btn ghost sm"; waB.textContent="💬 WA";
-        waB.onclick = () => window.open("https://wa.me/?text="+encodeURIComponent("Bu çekilişe katıl: "+location.href),"_blank");
-        const cpB = document.createElement("button"); cpB.className="btn ghost sm"; cpB.textContent="📋 Kopyala";
-        cpB.onclick = () => navigator.clipboard.writeText(location.href).then(()=>toast("Kopyalandı!"));
-        shareEl.appendChild(waB); shareEl.appendChild(cpB);
+      if(shareEl && !shareEl._done){
+        shareEl._done = true;
+        const mkBtn = (text, fn) => {
+          const b = document.createElement("button");
+          b.className="btn ghost sm"; b.textContent=text; b.onclick=fn;
+          shareEl.appendChild(b);
+        };
+        mkBtn("💬 WA", ()=>window.open("https://wa.me/?text="+encodeURIComponent("Bu çekilişe katıl: "+location.href),"_blank"));
+        mkBtn("📋 Kopyala", ()=>navigator.clipboard.writeText(location.href).then(()=>toast("Kopyalandı!")));
       }
 
       boom();
-      // Success icon animation
-      const ico = document.getElementById("ppSuccessIco");
-      if(ico){ ico.style.animation="pop .5s cubic-bezier(.34,1.56,.64,1)"; }
 
     }catch(e){
+      console.error("wireJoin error:", e.code, e.message);
       let msg = e.message;
-      if(e.code === "permission-denied") msg = "Firebase izin hatası! Firestore Rules güncellenmeli.";
-      toast("Hata: "+msg,"err");
-      console.error(e);
-      btn.disabled=false;
-      btn.innerHTML="🚀 Hemen Katıl";
+      if(e.code==="permission-denied") msg = "Firebase izin hatası!\n\nFirebase Console > Firestore > Rules sekmesine git ve:\nallow read, write: if true;\nekle (test için).";
+      if(e.code==="unavailable") msg = "İnternet bağlantısı yok.";
+      toast("Katılım hatası: "+msg,"err");
+      resetBtn();
     }
   });
 }
@@ -2578,7 +2619,8 @@ document.getElementById("durBtns")?.querySelectorAll("[data-d]").forEach(b=>b.ad
 
 // ── SEARCH ──
 document.getElementById("discSearch")?.addEventListener("input",function(){
-  document.getElementById("discSearchClr")?.classList.toggle("on",!!this.value.trim());
+  searchQ=this.value.trim();
+  document.getElementById("discSearchClr")?.classList.toggle("on",!!searchQ);
   clearTimeout(this._t);this._t=setTimeout(()=>{searchQ=this.value.trim();renderDiscover();},300);
 });
 document.getElementById("discSearchClr")?.addEventListener("click",()=>{
