@@ -473,6 +473,22 @@ select.inp{cursor:pointer;background-image:none}
 </head>
 <body>
 
+<!-- MAINTENANCE -->
+<div id="maintOv" style="display:none;position:fixed;inset:0;z-index:9999;background:linear-gradient(145deg,#060610,#0c0c1e);flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center">
+  <div style="font-size:64px;margin-bottom:20px;animation:bob 3s ease-in-out infinite">🔧</div>
+  <div style="font-family:'Unbounded',sans-serif;font-size:22px;font-weight:900;background:var(--fire);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:10px">Bakım Molası</div>
+  <div style="font-size:13px;color:var(--t2);max-width:320px;line-height:1.8;margin-bottom:24px" id="maintMsg">Site şu an bakımda. Kısa süre içinde döneceğiz! 🚀</div>
+  <div style="display:flex;flex-direction:column;align-items:center;gap:8px">
+    <div style="font-size:11px;color:var(--t3)">Tahmini süre</div>
+    <div id="maintTimer" style="font-family:'Unbounded',sans-serif;font-size:28px;font-weight:700;color:var(--t1)">—</div>
+  </div>
+  <div style="margin-top:32px;padding:14px 20px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:16px;max-width:340px">
+    <div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);margin-bottom:8px">Bizi Takip Et</div>
+    <div style="font-size:12px;color:var(--t2)">Bakım tamamlandığında haber almak için sosyal medyamızı takip edin.</div>
+  </div>
+  <div style="position:absolute;bottom:max(20px,calc(var(--safe-bot)+10px));font-size:10px;color:var(--t3)">RAFFLE © 2025</div>
+</div>
+
 <div id="amb"><div class="ab ab1"></div><div class="ab ab2"></div><div class="ab ab3"></div></div>
 <canvas id="cnf"></canvas>
 <div id="toasts"></div>
@@ -550,6 +566,7 @@ select.inp{cursor:pointer;background-image:none}
     <div class="dash-hdr">
       <div class="dash-t">👋 <span id="dName">—</span></div>
       <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button class="btn btn-ghost btn-sm hidden" id="maintBtn" style="color:var(--red)">🔧 Bakım</button>
         <button class="btn btn-ghost btn-sm hidden" id="cleanBtn" style="color:var(--ora)">🧹 Temizle</button>
         <button class="btn btn-ghost btn-sm" id="refBtn">🔄 Yenile</button>
       </div>
@@ -792,6 +809,35 @@ select.inp{cursor:pointer;background-image:none}
     </div>
     <div class="mgr-panel" id="mt-wn"><div id="winnersPanel"><div class="empty"><div class="empty-t">Kazanan seçilmedi.</div></div></div></div>
     <div class="mgr-panel" id="mt-st"><div id="statsPanel"></div></div>
+  </div>
+</div>
+
+<!-- MAINTENANCE MODAL -->
+<div class="overlay" id="maintModalOv">
+  <div class="modal" style="max-width:380px">
+    <div class="modal-hdr">
+      <div><div class="modal-t">🔧 Bakım Modu</div><div class="modal-s">Herkes bakım ekranı görür, sen girebilirsin</div></div>
+      <button class="xbtn" id="maintModalX">✕</button>
+    </div>
+    <div id="maintStatus" style="padding:10px 14px;border-radius:12px;font-size:12px;font-weight:600;margin-bottom:14px;text-align:center">Kontrol ediliyor...</div>
+    <div class="field">
+      <label class="lbl">Bakım Mesajı</label>
+      <input class="inp" id="maintMsgInp" value="Site şu an bakımda. Kısa süre içinde döneceğiz! 🚀">
+    </div>
+    <div class="field">
+      <label class="lbl">Tahmini Bitiş (opsiyonel)</label>
+      <input class="inp" type="datetime-local" id="maintEndInp">
+      <div class="dur-row" style="margin-top:6px">
+        <button class="dur-btn maint-dur" data-m="30">30dk</button>
+        <button class="dur-btn maint-dur" data-m="60">1sa</button>
+        <button class="dur-btn maint-dur" data-m="120">2sa</button>
+        <button class="dur-btn maint-dur" data-m="360">6sa</button>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-fire btn-block" id="maintStartBtn" style="padding:12px">🔧 Bakımı Başlat</button>
+      <button class="btn btn-ghost" id="maintStopBtn" style="padding:12px 16px;color:var(--grn);border-color:rgba(48,209,88,.3);display:none">✅ Bitir</button>
+    </div>
   </div>
 </div>
 
@@ -1043,6 +1089,49 @@ window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();dp=e;docume
 document.getElementById("installBtn")?.addEventListener("click",async()=>{if(!dp)return;dp.prompt();const{outcome}=await dp.userChoice;if(outcome==="accepted"){document.getElementById("installBtn").style.display="none";dp=null;}});
 if("serviceWorker"in navigator)navigator.serviceWorker.register("/sw.js").catch(()=>{});
 
+// ── MAINTENANCE ──
+let maintUnsub=null;
+
+function checkMaintenance(){
+  if(maintUnsub)return; // already listening
+  maintUnsub=onSnapshot(doc(db,"config","maintenance"),snap=>{
+    if(!snap.exists()){hideMaint();return;}
+    const d=snap.data();
+    if(d.active){showMaint(d);}
+    else{hideMaint();}
+  });
+}
+
+function showMaint(d){
+  const ov=document.getElementById("maintOv");
+  if(!ov)return;
+  ov.style.display="flex";
+  document.body.style.overflow="hidden";
+  const msg=document.getElementById("maintMsg");
+  if(msg&&d.message)msg.textContent=d.message;
+  // Countdown to endsAt
+  if(d.endsAt){
+    clearInterval(window._maintTick);
+    window._maintTick=setInterval(()=>{
+      const ms=new Date(d.endsAt)-Date.now();
+      const t=document.getElementById("maintTimer");
+      if(!t)return;
+      if(ms<=0){t.textContent="Az kaldı...";clearInterval(window._maintTick);return;}
+      const h=Math.floor(ms/3600000),m=Math.floor(ms%3600000/60000),s=Math.floor(ms%60000/1000);
+      t.textContent=(h>0?h+"s ":"")+m+"dk "+s+"sn";
+    },1000);
+  } else {
+    const t=document.getElementById("maintTimer");if(t)t.textContent="Yakında";
+  }
+}
+
+function hideMaint(){
+  const ov=document.getElementById("maintOv");
+  if(ov)ov.style.display="none";
+  document.body.style.overflow="";
+  clearInterval(window._maintTick);
+}
+
 // ── ROUTER ──
 let ppDone=false,prDone=false;
 function go(id){
@@ -1064,7 +1153,10 @@ onAuthStateChanged(auth,user=>{
   isAdmin=ME?.email===ADMIN;
   if(ME?.email){localStorage.setItem("r_admin_email",ME.email);window._erudaCheck&&window._erudaCheck(ME.email);}
   else{localStorage.removeItem("r_admin_email");}
-  
+
+  // Check maintenance — admin bypasses
+  if(!isAdmin) checkMaintenance();
+
   if(isPart){
     document.querySelector("nav").style.display="none";
     go("pgPP");
@@ -1108,6 +1200,8 @@ onAuthStateChanged(auth,user=>{
     const dn=document.getElementById("dName");if(dn)dn.textContent=nm.split(" ")[0];
     const cb=document.getElementById("cleanBtn");
     if(cb)cb.classList.toggle("hidden",ME.email!==ADMIN);
+    const mb=document.getElementById("maintBtn");
+    if(mb)mb.classList.toggle("hidden",ME.email!==ADMIN);
   }
   updateCreate();
 });
@@ -1438,7 +1532,7 @@ function tickCds(){
 }
 
 document.getElementById("discStatus")?.addEventListener("change",e=>{curStatus=e.target.value;renderDiscover();});
-setInterval(()=>{if(document.getElementById("pgD")?.classList.contains("on"))loadDiscover();},60000);
+setInterval(()=>{if(document.getElementById("pgD")?.classList.contains("on")&&document.getElementById("maintOv")?.style.display==="none")loadDiscover();},60000);
 
 // ── PROFILE ──
 async function loadProfile(uid){
@@ -1532,6 +1626,72 @@ async function openEdit(drawId){
 }
 
 // Clean DB
+// ── MAINTENANCE ADMIN JS ──
+document.getElementById("maintBtn")?.addEventListener("click",async()=>{
+  if(!ME||ME.email!==ADMIN){toast("Yetkisiz!","err");return;}
+  // Check current status
+  const statusEl=document.getElementById("maintStatus");
+  const startBtn=document.getElementById("maintStartBtn");
+  const stopBtn=document.getElementById("maintStopBtn");
+  try{
+    const snap=await getDoc(doc(db,"config","maintenance"));
+    const active=snap.exists()&&snap.data().active;
+    if(statusEl){
+      statusEl.textContent=active?"🔴 Bakım Modu AKTİF":"🟢 Site Normal Çalışıyor";
+      statusEl.style.background=active?"rgba(255,45,85,.12)":"rgba(48,209,88,.1)";
+      statusEl.style.border="1px solid "+(active?"rgba(255,45,85,.3)":"rgba(48,209,88,.25)");
+      statusEl.style.color=active?"var(--red)":"var(--grn)";
+    }
+    if(active){
+      if(startBtn)startBtn.style.display="none";
+      if(stopBtn)stopBtn.style.display="block";
+      const d=snap.data();
+      const mi=document.getElementById("maintMsgInp");if(mi&&d.message)mi.value=d.message;
+      const ei=document.getElementById("maintEndInp");if(ei&&d.endsAt)ei.value=new Date(new Date(d.endsAt)-new Date().getTimezoneOffset()*60000).toISOString().slice(0,16);
+    } else {
+      if(startBtn)startBtn.style.display="block";
+      if(stopBtn)stopBtn.style.display="none";
+    }
+  }catch(e){if(statusEl){statusEl.textContent="Hata: "+e.message;statusEl.style.background="rgba(255,45,85,.1)";}}
+  document.getElementById("maintModalOv")?.classList.add("on");
+});
+
+document.getElementById("maintModalX")?.addEventListener("click",()=>document.getElementById("maintModalOv")?.classList.remove("on"));
+
+document.getElementById("maintStartBtn")?.addEventListener("click",async()=>{
+  if(!ME||ME.email!==ADMIN)return;
+  const btn=document.getElementById("maintStartBtn");btn.disabled=true;btn.innerHTML='<span class="spin"></span>';
+  const msg=document.getElementById("maintMsgInp")?.value.trim()||"Site şu an bakımda. Kısa süre içinde döneceğiz! 🚀";
+  const endVal=document.getElementById("maintEndInp")?.value;
+  const endsAt=endVal?new Date(endVal).toISOString():"";
+  try{
+    await setDoc(doc(db,"config","maintenance"),{active:true,message:msg,endsAt,startedAt:new Date().toISOString(),startedBy:ME.email});
+    toast("🔧 Bakım modu başlatıldı!","warn");
+    document.getElementById("maintModalOv")?.classList.remove("on");
+    addNotif("🔧","Bakım modu başlatıldı");
+  }catch(e){toast("Hata: "+e.message,"err");}
+  finally{btn.disabled=false;btn.innerHTML="🔧 Bakımı Başlat";}
+});
+
+document.getElementById("maintStopBtn")?.addEventListener("click",async()=>{
+  if(!ME||ME.email!==ADMIN)return;
+  const btn=document.getElementById("maintStopBtn");btn.disabled=true;
+  try{
+    await setDoc(doc(db,"config","maintenance"),{active:false,message:"",endsAt:"",endedAt:new Date().toISOString()});
+    toast("✅ Bakım modu kapatıldı!","ok");
+    document.getElementById("maintModalOv")?.classList.remove("on");
+    addNotif("✅","Site normale döndü");
+  }catch(e){toast("Hata: "+e.message,"err");}
+  finally{btn.disabled=false;}
+});
+
+// Duration quick buttons for maintenance
+document.querySelectorAll(".maint-dur").forEach(b=>b.addEventListener("click",()=>{
+  const d=new Date(Date.now()+parseInt(b.dataset.m)*60000);
+  const el=document.getElementById("maintEndInp");
+  if(el)el.value=new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,16);
+}));
+
 document.getElementById("cleanBtn")?.addEventListener("click",async()=>{
   document.getElementById("cleanOv")?.classList.add("on");const list=document.getElementById("cleanList");if(!list)return;list.innerHTML='<span class="spin"></span>';
   try{const snap=await getDocs(collection(db,"giveaways"));const draws=[];snap.forEach(d=>draws.push({id:d.id,...d.data()}));if(!draws.length){list.innerHTML='<div style="font-size:12px;color:var(--t3);text-align:center;padding:10px">Veri yok.</div>';return;}list.innerHTML="";draws.forEach(dw=>{const div=document.createElement("div");div.style.cssText="display:flex;align-items:center;justify-content:space-between;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:8px 13px;";div.innerHTML='<div><div style="font-size:12px;font-weight:600">'+(dw.drawNameDisplay||dw.drawName||dw.id).replace(/_/g," ")+'</div><div style="font-size:10px;color:var(--t3)">'+(dw.creatorName||"?").replace(/_/g," ")+" · "+(dw.partCount||0)+' kişi</div></div><input type="checkbox" class="ck" data-id="'+dw.id+'" style="width:16px;height:16px;cursor:pointer;accent-color:var(--red)">';list.appendChild(div);});}catch(e){list.innerHTML='<div style="color:var(--red);font-size:11px">Hata: '+e.message+'</div>';}
