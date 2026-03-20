@@ -160,10 +160,10 @@ select.inp{cursor:pointer;background-image:none}
 .sheet-handle{width:36px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 16px}
 
 /* OVERLAYS */
-.overlay{position:fixed;inset:0;z-index:400;background:rgba(0,0,0,.88);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);display:flex;align-items:center;justify-content:center;padding:12px;opacity:0;pointer-events:none;transition:opacity .22s}
+.overlay{position:fixed;inset:0;z-index:400;background:rgba(0,0,0,.88);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);display:flex;align-items:flex-end;justify-content:center;padding:0;opacity:0;pointer-events:none;transition:opacity .22s}@media(min-width:560px){.overlay{align-items:center;padding:12px}}
 .overlay.on{opacity:1;pointer-events:all}
-.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:22px;padding:20px;width:100%;max-width:520px;max-height:88dvh;overflow-y:auto;transform:scale(.88) translateY(24px);transition:transform .28s cubic-bezier(.34,1.56,.64,1)}
-.overlay.on .modal{transform:scale(1) translateY(0)}
+.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:22px;padding:16px;width:100%;max-width:520px;max-height:88dvh;overflow-y:auto;overflow-x:hidden;transform:scale(.88) translateY(24px);transition:transform .28s cubic-bezier(.34,1.56,.64,1);-webkit-overflow-scrolling:touch}
+.overlay.on .modal{transform:scale(1) translateY(0)}@media(max-width:559px){.modal{border-radius:22px 22px 0 0;max-height:92dvh;padding-bottom:max(16px,var(--safe-bot))}}
 .modal-hdr{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px}
 .modal-t{font-family:'Unbounded',sans-serif;font-size:14px;font-weight:700}
 .modal-s{font-size:11px;color:var(--t2);margin-top:3px}
@@ -178,7 +178,7 @@ select.inp{cursor:pointer;background-image:none}
 .hero h1{font-family:'Unbounded',sans-serif;font-size:clamp(22px,6vw,44px);font-weight:900;line-height:1.05;letter-spacing:-.05em;margin-bottom:10px}
 .hero-hl{background:var(--fire);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 .hero p{color:var(--t2);font-size:13px;max-width:340px;margin:0 auto 24px;line-height:1.7}
-.hero-stats{display:flex;justify-content:center;gap:32px;flex-wrap:wrap}
+.hero-stats{display:flex;justify-content:center;gap:20px 32px;flex-wrap:wrap}
 .hs-n{font-family:'Unbounded',sans-serif;font-size:24px;font-weight:700;background:var(--fire);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 .hs-l{font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;margin-top:3px}
 .dbody{max-width:1040px;margin:0 auto;padding:18px 12px 0}
@@ -198,7 +198,7 @@ select.inp{cursor:pointer;background-image:none}
 .fsel{background:var(--card);border:1.5px solid var(--border);border-radius:10px;padding:7px 12px;color:var(--t1);font-family:'Outfit',sans-serif;font-size:11px;outline:none;cursor:pointer;-webkit-appearance:none;flex:1;transition:border-color .15s}
 .fsel:focus{border-color:var(--red)}
 /* Cards Grid */
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(270px,100%),1fr));gap:10px}
 @media(max-width:480px){.grid{grid-template-columns:1fr}}
 @media(min-width:600px)and(max-width:1039px){.grid{grid-template-columns:repeat(2,1fr)}}
 /* Card */
@@ -233,12 +233,12 @@ select.inp{cursor:pointer;background-image:none}
 .dash-t{font-family:'Unbounded',sans-serif;font-size:16px;font-weight:700}
 .kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:14px}
 @media(max-width:600px){.kpis{grid-template-columns:repeat(3,1fr)}}
-@media(max-width:360px){.kpis{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:400px){.kpis{grid-template-columns:repeat(2,1fr)}}
 .kpi{padding:12px 10px}
 .kpi-i{font-size:18px;margin-bottom:5px}
 .kpi-n{font-family:'Unbounded',sans-serif;font-size:20px;font-weight:700;background:var(--fire);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 .kpi-l{font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.07em;margin-top:2px}
-.my-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:10px}
+.my-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(270px,100%),1fr));gap:8px}
 @media(max-width:480px){.my-grid{grid-template-columns:1fr}}
 .my-card{padding:0;animation:fu .3s ease both;overflow:hidden}
 .my-img{width:100%;height:70px;object-fit:cover;display:block;border-radius:18px 18px 0 0}
@@ -251,7 +251,7 @@ select.inp{cursor:pointer;background-image:none}
 .my-sn{font-family:'Unbounded',sans-serif;font-size:13px;font-weight:700;background:var(--fire);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 .my-sl{font-size:8px;color:var(--t3);text-transform:uppercase;letter-spacing:.05em;margin-top:1px}
 .my-foot{display:flex;gap:4px;flex-wrap:wrap}
-.my-foot .btn{flex:1;font-size:10px;min-width:0;padding:7px 5px}
+.my-foot .btn{flex:1;font-size:9px;min-width:0;padding:6px 4px}
 
 /* ── CREATE ── */
 .cw{max-width:580px;margin:0 auto;padding:20px 12px}
@@ -368,7 +368,7 @@ select.inp{cursor:pointer;background-image:none}
 
 /* ── MANAGER ── */
 .mgr-tabs{display:flex;gap:2px;background:var(--card);border-radius:12px;padding:3px;margin-bottom:14px}
-.mgr-tab{flex:1;padding:7px;border-radius:10px;font-size:11px;font-weight:600;color:var(--t3);cursor:pointer;border:none;background:none;font-family:'Outfit',sans-serif;text-align:center;transition:all .14s}
+.mgr-tab{flex:1;padding:6px 4px;border-radius:10px;font-size:10px;font-weight:600;color:var(--t3);cursor:pointer;border:none;background:none;font-family:'Outfit',sans-serif;text-align:center;transition:all .14s}
 .mgr-tab.on{background:rgba(255,45,85,.15);color:var(--red)}
 .mgr-panel{display:none}.mgr-panel.on{display:block}
 .mgr-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:13px}
@@ -393,29 +393,35 @@ select.inp{cursor:pointer;background-image:none}
 /* ── SLOT ── */
 #slotOv{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.97);backdrop-filter:blur(30px);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s}
 #slotOv.on{opacity:1;pointer-events:all}
-.slot-box{text-align:center;background:linear-gradient(160deg,rgba(255,255,255,.08),rgba(255,255,255,.02));border:1px solid var(--border2);border-radius:22px;padding:24px 20px;max-width:350px;width:93%;position:relative;overflow:hidden}
-.slot-scan{position:absolute;top:0;left:0;right:0;height:2px;background:var(--fire);animation:scan 1.1s linear infinite}
+/* ── SLOT MACHINE ── */
+#slotOv{position:fixed;inset:0;z-index:500;background:rgba(2,2,14,.97);backdrop-filter:blur(40px);-webkit-backdrop-filter:blur(40px);display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:opacity .25s}
+#slotOv.on{opacity:1;pointer-events:all}
+.slot-box{text-align:center;background:linear-gradient(160deg,rgba(255,255,255,.06),rgba(255,255,255,.01));border:1px solid rgba(255,255,255,.1);border-radius:24px;padding:18px 14px 20px;width:100%;max-width:380px;position:relative;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.7)}
+.slot-scan{position:absolute;top:0;left:0;right:0;height:2px;background:var(--fire);animation:scan 1.2s linear infinite;pointer-events:none}
 @keyframes scan{0%{transform:scaleX(0);transform-origin:left}49%{transform:scaleX(1);transform-origin:left}50%{transform:scaleX(1);transform-origin:right}100%{transform:scaleX(0);transform-origin:right}}
-.slot-ey{font-family:'Unbounded',sans-serif;font-size:9px;font-weight:700;letter-spacing:.18em;color:var(--t3);margin-bottom:5px}
-.slot-pl{font-size:12px;color:var(--yel);font-weight:600;margin-bottom:12px;min-height:16px}
-.slot-win{height:140px;overflow:hidden;position:relative;border-radius:14px;background:rgba(0,0,0,.65);border:1px solid rgba(255,255,255,.1);margin-bottom:11px}
-.slot-win::before,.slot-win::after{content:'';position:absolute;left:0;right:0;height:50px;z-index:2;pointer-events:none}
-.slot-win::before{top:0;background:linear-gradient(to bottom,rgba(0,0,0,.95),transparent)}
-.slot-win::after{bottom:0;background:linear-gradient(to top,rgba(0,0,0,.95),transparent)}
-.slot-cur{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);height:46px;z-index:1;border-top:1px solid rgba(255,45,85,.65);border-bottom:1px solid rgba(255,45,85,.65);background:rgba(255,45,85,.07)}
-.slot-reel{display:flex;flex-direction:column}
-.slot-item{height:46px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;padding:0 14px;color:var(--t3);flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.slot-item.on{color:var(--t1);font-size:14px;font-weight:800}
-.slot-bar-wrap{height:2px;background:rgba(255,255,255,.06);border-radius:2px;margin-bottom:9px;overflow:hidden}
-.slot-bar{height:100%;background:var(--fire);width:0%}
-.slot-st{font-size:11px;color:var(--t2);min-height:14px;margin-bottom:10px}
-.slot-rev{display:none}.slot-rev.on{display:block;animation:revIn .6s cubic-bezier(.34,1.56,.64,1) both}
-@keyframes revIn{from{opacity:0;transform:scale(.5) rotateY(90deg)}to{opacity:1;transform:scale(1) rotateY(0)}}
-.slot-trophy{font-size:44px;display:block;margin-bottom:9px;animation:pop .7s cubic-bezier(.34,1.56,.64,1) .2s both}
-.slot-wname{font-family:'Unbounded',sans-serif;font-size:18px;font-weight:900;letter-spacing:-.04em;background:var(--gold);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin:5px 0 3px;line-height:1.1}
-.slot-wemail{font-size:11px;color:var(--t2);margin-bottom:9px}
-.slot-wprize{display:inline-block;padding:4px 14px;border-radius:20px;background:linear-gradient(135deg,rgba(255,214,10,.15),rgba(255,149,0,.1));border:1px solid rgba(255,214,10,.3);font-weight:700;font-size:11px;color:var(--yel);margin-bottom:13px}
-.slot-hash{font-size:9px;color:var(--t3);margin-top:5px;font-family:monospace;word-break:break-all;opacity:.5}
+.slot-ey{font-family:'Unbounded',sans-serif;font-size:8px;font-weight:700;letter-spacing:.22em;color:var(--t3);margin-bottom:4px;text-transform:uppercase}
+.slot-pl{font-size:13px;color:var(--yel);font-weight:700;margin-bottom:14px;min-height:18px;background:var(--gold);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.slot-win{height:160px;overflow:hidden;position:relative;border-radius:16px;background:rgba(0,0,0,.8);border:1px solid rgba(255,255,255,.08);margin-bottom:14px}
+.slot-win::before,.slot-win::after{content:'';position:absolute;left:0;right:0;height:55px;z-index:2;pointer-events:none}
+.slot-win::before{top:0;background:linear-gradient(to bottom,rgba(2,2,14,.98),transparent)}
+.slot-win::after{bottom:0;background:linear-gradient(to top,rgba(2,2,14,.98),transparent)}
+.slot-cur{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);height:52px;z-index:1;border-top:1.5px solid rgba(255,45,85,.7);border-bottom:1.5px solid rgba(255,45,85,.7);background:rgba(255,45,85,.06)}
+.slot-cur::before{content:'▶';position:absolute;left:-2px;top:50%;transform:translateY(-50%);color:rgba(255,45,85,.7);font-size:10px}
+.slot-cur::after{content:'◀';position:absolute;right:-2px;top:50%;transform:translateY(-50%);color:rgba(255,45,85,.7);font-size:10px}
+.slot-reel{display:flex;flex-direction:column;will-change:transform}
+.slot-item{height:52px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:500;padding:0 20px;color:rgba(255,255,255,.2);flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;transition:color .1s,font-size .1s}
+.slot-item.on{color:#fff;font-size:16px;font-weight:800;text-shadow:0 0 20px rgba(255,45,85,.5)}
+.slot-bar-wrap{height:3px;background:rgba(255,255,255,.05);border-radius:3px;margin-bottom:10px;overflow:hidden}
+.slot-bar{height:100%;background:var(--fire);width:0%;transition:none}
+.slot-st{font-size:11px;color:var(--t2);min-height:15px;margin-bottom:10px;font-weight:500}
+.slot-rev{display:none;padding-top:4px}
+.slot-rev.on{display:block;animation:revIn .7s cubic-bezier(.34,1.56,.64,1) both}
+@keyframes revIn{from{opacity:0;transform:scale(.4) rotateY(-90deg)}to{opacity:1;transform:scale(1) rotateY(0)}}
+.slot-trophy{font-size:52px;display:block;margin-bottom:8px;animation:pop .8s cubic-bezier(.34,1.56,.64,1) .1s both;filter:drop-shadow(0 0 20px rgba(255,214,10,.5))}
+.slot-wname{font-family:'Unbounded',sans-serif;font-size:clamp(16px,5vw,22px);font-weight:900;letter-spacing:-.04em;background:var(--gold);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin:6px 0 4px;line-height:1.1}
+.slot-wemail{font-size:11px;color:var(--t2);margin-bottom:10px;word-break:break-all}
+.slot-wprize{display:inline-block;padding:5px 16px;border-radius:20px;background:linear-gradient(135deg,rgba(255,214,10,.15),rgba(255,149,0,.08));border:1px solid rgba(255,214,10,.35);font-weight:700;font-size:12px;color:var(--yel);margin-bottom:14px}
+.slot-hash{font-size:9px;color:var(--t3);margin-top:6px;font-family:monospace;word-break:break-all;opacity:.4;line-height:1.4}
 
 /* ── LIVE ── */
 #liveOv{position:fixed;inset:0;z-index:700;background:#000;display:none;flex-direction:column;align-items:center;justify-content:center}
@@ -1962,46 +1968,119 @@ document.getElementById("drawBtn")?.addEventListener("click",async()=>{
 });
 
 function runSlot(parts,prize,prizeIdx){
-  const reel=document.getElementById("slotReel");reel.innerHTML="";
+  const ITEM_H=52; // must match .slot-item height in CSS
+  const reel=document.getElementById("slotReel");
+  if(!reel)return;
+  reel.innerHTML="";
+
   const names=parts.map(p=>p.name||"?");
-  const winner=parts[~~(Math.random()*parts.length)];
-  const TOTAL=40+~~(Math.random()*20);
-  const items=[];for(let i=0;i<TOTAL;i++)items.push(names[~~(Math.random()*names.length)]);
-  items.push(winner.name||"?");
-  items.forEach(n=>{const d=document.createElement("div");d.className="slot-item";d.textContent=n;reel.appendChild(d);});
-  const dur=slotSpeed,start=Date.now();
-  function slotEase(t){return t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;}
-  function slotFrame(){
-    const elapsed=Date.now()-start,progress=Math.min(elapsed/dur,1),eased=slotEase(progress);
-    const targetIdx=items.length-1;const curIdx=Math.floor(eased*targetIdx);
-    document.querySelectorAll(".slot-item").forEach((el,i)=>el.classList.toggle("on",i===curIdx));
-    reel.style.transform="translateY(-"+(curIdx*46)+"px)";
-    document.getElementById("slotBar").style.width=(eased*100)+"%";
-    document.getElementById("slotSt").textContent=progress<.5?"Hızlanıyor...":progress<.9?"Yavaşlıyor...":"Duruyor...";
-    if(progress<1){requestAnimationFrame(slotFrame);}
-    else{
-      // Show winner
+  const winner=parts[Math.floor(Math.random()*parts.length)];
+  const TOTAL=50+Math.floor(Math.random()*20);
+
+  // Build item list - winner always at end
+  const items=[];
+  for(let i=0;i<TOTAL;i++)items.push(names[Math.floor(Math.random()*names.length)]);
+  items.push(winner.name||"?"); // guaranteed winner at last position
+
+  // Create DOM nodes
+  const nodes=items.map(n=>{
+    const d=document.createElement("div");
+    d.className="slot-item";
+    d.textContent=n;
+    reel.appendChild(d);
+    return d;
+  });
+
+  // Reset UI
+  const barEl=document.getElementById("slotBar");
+  const stEl=document.getElementById("slotSt");
+  const revEl=document.getElementById("slotRev");
+  const speEl=document.getElementById("slotSpeeds");
+  if(barEl)barEl.style.width="0%";
+  if(stEl)stEl.textContent="Karıştırılıyor...";
+  if(revEl)revEl.classList.remove("on");
+  if(speEl)speEl.style.display="flex";
+
+  const dur=slotSpeed;
+  const start=performance.now();
+  const totalIdx=items.length-1;
+  let lastIdx=-1;
+  let rafId=null;
+
+  function slotEase(t){
+    // Ease: fast start, slow end
+    return t<0.7 ? 2*t*t : 1-Math.pow(-2*t+2,3)/2;
+  }
+
+  function slotFrame(now){
+    const elapsed=now-start;
+    const raw=Math.min(elapsed/dur,1);
+    const eased=slotEase(raw);
+    const curIdx=Math.floor(eased*totalIdx);
+
+    // Only update DOM when index changes
+    if(curIdx!==lastIdx){
+      if(lastIdx>=0&&nodes[lastIdx])nodes[lastIdx].classList.remove("on");
+      if(nodes[curIdx])nodes[curIdx].classList.add("on");
+      lastIdx=curIdx;
+    }
+
+    // Smooth transform
+    reel.style.transform="translateY("+(-(curIdx*ITEM_H))+"px)";
+
+    // Progress bar
+    if(barEl)barEl.style.width=(eased*100)+"%";
+
+    // Status text
+    if(stEl){
+      if(raw<0.3)stEl.textContent="🎲 Karıştırılıyor...";
+      else if(raw<0.7)stEl.textContent="⚡ Hızlanıyor...";
+      else if(raw<0.95)stEl.textContent="🎯 Yavaşlıyor...";
+      else stEl.textContent="⏹️ Duruyor...";
+    }
+
+    if(raw<1){
+      rafId=requestAnimationFrame(slotFrame);
+    }else{
+      // Snap to winner (last item)
+      if(lastIdx!==totalIdx){
+        if(nodes[lastIdx])nodes[lastIdx].classList.remove("on");
+        if(nodes[totalIdx])nodes[totalIdx].classList.add("on");
+        reel.style.transform="translateY("+(-(totalIdx*ITEM_H))+"px)";
+      }
+      if(stEl)stEl.textContent="";
+      if(speEl)speEl.style.display="none";
+
+      // Short delay then show reveal
       setTimeout(async()=>{
-        document.getElementById("slotWN").textContent=winner.name||"?";
-        document.getElementById("slotWE").textContent=winner.email||"";
-        document.getElementById("slotWP").textContent=prize;
-        const hash=btoa(winner.email+prize+Date.now()).slice(0,12).toUpperCase();
-        document.getElementById("slotHash").textContent="Hash: #"+hash;
-        document.getElementById("slotSt").textContent="";document.getElementById("slotSpeeds").style.display="none";
-        document.getElementById("slotRev").classList.add("on");
-        // Save to Firestore
+        const wnEl=document.getElementById("slotWN");
+        const weEl=document.getElementById("slotWE");
+        const wpEl=document.getElementById("slotWP");
+        const whEl=document.getElementById("slotHash");
+        if(wnEl)wnEl.textContent=winner.name||"?";
+        if(weEl)weEl.textContent=winner.email||"";
+        if(wpEl)wpEl.textContent="🎁 "+prize;
+        if(whEl)whEl.textContent="Doğrulama: #"+btoa((winner.email||"")+prize).slice(0,10).toUpperCase();
+        if(revEl)revEl.classList.add("on");
+
         try{
-          await updateDoc(doc(db,"giveaways/"+mgrId+"/participants",winner.id),{isWinner:true,wonPrize:prize,wonAt:serverTimestamp()});
+          await updateDoc(doc(db,"giveaways/"+mgrId+"/participants",winner.id),{
+            isWinner:true,wonPrize:prize,wonAt:serverTimestamp()
+          });
           await updateDoc(doc(db,"giveaways",mgrId),{winCount:increment(1)});
-          const pw=document.getElementById("pw_"+prizeIdx);if(pw){pw.textContent=winner.name||"?";pw.style.color="var(--grn)";}
+          const pw=document.getElementById("pw_"+prizeIdx);
+          if(pw){pw.textContent=winner.name||"?";pw.style.color="var(--grn)";}
           boom();
-          // Send email
           sendWinnerEmail(winner,prize);
-        }catch(e){dbgErr("slot save:",e);}
-      },400);
+        }catch(e){
+          dbgErr("slot save:",e);
+          toast("Kayıt hatası: "+e.message,"err");
+        }
+      },600);
     }
   }
-  requestAnimationFrame(slotFrame);
+
+  rafId=requestAnimationFrame(slotFrame);
 }
 
 function sendWinnerEmail(winner,prize){
@@ -2045,36 +2124,60 @@ function runLive(){
 }
 
 function runLiveSlot(prize,prizeIdx){
+  const ITEM_H=64;
   const parts=[...mgrParts];
-  const reel=document.getElementById("liveReel");reel.innerHTML="";
-  const winner=parts[~~(Math.random()*parts.length)];
+  const reel=document.getElementById("liveReel");
+  if(!reel)return;
+  reel.innerHTML="";
+
+  const winner=parts[Math.floor(Math.random()*parts.length)];
   const names=parts.map(p=>p.name||"?");
-  const TOTAL=40+~~(Math.random()*20);
-  const items=[];for(let i=0;i<TOTAL;i++)items.push(names[~~(Math.random()*names.length)]);
+  const TOTAL=50+Math.floor(Math.random()*20);
+  const items=[];
+  for(let i=0;i<TOTAL;i++)items.push(names[Math.floor(Math.random()*names.length)]);
   items.push(winner.name||"?");
-  items.forEach(n=>{const d=document.createElement("div");d.className="live-item";d.textContent=n;reel.appendChild(d);});
-  const dur=slotSpeed,start=Date.now();
+
+  const nodes=items.map(n=>{
+    const d=document.createElement("div");d.className="live-item";d.textContent=n;reel.appendChild(d);return d;
+  });
+
   const pb=document.getElementById("livePB");
-  function liveEase(t){return t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;}
-  function liveFrame(){
-    const elapsed=Date.now()-start,progress=Math.min(elapsed/dur,1),eased=liveEase(progress);
-    const targetIdx=items.length-1,curIdx=Math.floor(eased*targetIdx);
-    document.querySelectorAll(".live-item").forEach((el,i)=>el.classList.toggle("on",i===curIdx));
-    reel.style.transform="translateY(-"+(curIdx*64)+"px)";
+  const dur=slotSpeed,start=performance.now();
+  const totalIdx=items.length-1;
+  let lastIdx=-1;
+
+  function liveEase(t){return t<0.7?2*t*t:1-Math.pow(-2*t+2,3)/2;}
+
+  function liveFrame(now){
+    const raw=Math.min((now-start)/dur,1);
+    const eased=liveEase(raw);
+    const curIdx=Math.floor(eased*totalIdx);
+    if(curIdx!==lastIdx){
+      if(lastIdx>=0&&nodes[lastIdx])nodes[lastIdx].classList.remove("on");
+      if(nodes[curIdx])nodes[curIdx].classList.add("on");
+      lastIdx=curIdx;
+    }
+    reel.style.transform="translateY("+(-(curIdx*ITEM_H))+"px)";
     if(pb)pb.style.width=(eased*100)+"%";
-    if(progress<1){requestAnimationFrame(liveFrame);}
+    if(raw<1){requestAnimationFrame(liveFrame);}
     else{
+      if(nodes[lastIdx])nodes[lastIdx].classList.remove("on");
+      if(nodes[totalIdx])nodes[totalIdx].classList.add("on");
+      reel.style.transform="translateY("+(-(totalIdx*ITEM_H))+"px)";
       setTimeout(async()=>{
-        document.getElementById("liveWN").textContent=winner.name||"?";
-        document.getElementById("liveWP").textContent=prize;
-        document.getElementById("liveRev").style.display="block";
+        const wnEl=document.getElementById("liveWN");
+        const wpEl=document.getElementById("liveWP");
+        const revEl=document.getElementById("liveRev");
+        if(wnEl)wnEl.textContent=winner.name||"?";
+        if(wpEl)wpEl.textContent="🎁 "+prize;
+        if(revEl)revEl.style.display="block";
         boom();
         try{
           await updateDoc(doc(db,"giveaways/"+mgrId+"/participants",winner.id),{isWinner:true,wonPrize:prize,wonAt:serverTimestamp()});
           await updateDoc(doc(db,"giveaways",mgrId),{winCount:increment(1)});
           sendWinnerEmail(winner,prize);
         }catch(e){dbgErr("live save:",e);}
-      },500);
+      },600);
     }
   }
   requestAnimationFrame(liveFrame);
