@@ -1385,6 +1385,7 @@ document.getElementById("pubBtn").addEventListener("click",async()=>{
   const ejsT=document.getElementById("ejsT").value.trim();
   const ejsK=document.getElementById("ejsK").value.trim();
   const safeC=(ME.displayName||ME.email||"u").replace(/\s+/g,"_").replace(/\W/g,"").toLowerCase();
+  const safeG=name.replace(/\s+/g,"_").replace(/[^\w]/gi,"").toLowerCase().slice(0,40);
   const btn=document.getElementById("pubBtn");btn.disabled=true;btn.innerHTML='<span class="spin"></span> Olusturuluyor...';
   try{
     const eq=query(collection(db,"giveaways"),where("creatorId","==",ME.uid));
