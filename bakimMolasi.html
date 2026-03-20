@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#03030a">
+<title>Bakım Molası — Raffle</title>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;700;900&family=Outfit:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#03030a;--s1:#08080f;--s2:#0e0e1c;
+  --red:#ff2d55;--ora:#ff9500;--yel:#ffd60a;--grn:#30d158;--blu:#0a84ff;
+  --fire:linear-gradient(135deg,#ff2d55,#ff9500);
+  --t1:#f0f0ff;--t2:#7777aa;--t3:#33334a;
+  --border:rgba(255,255,255,.07);--border2:rgba(255,255,255,.13);
+  --safe-bot:env(safe-area-inset-bottom,0px);
+}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-family:'Outfit',sans-serif;-webkit-font-smoothing:antialiased}
+
+/* ── CANVAS BG ── */
+#bg{position:fixed;inset:0;z-index:0}
+
+/* ── NOISE TEXTURE ── */
+body::after{content:'';position:fixed;inset:0;z-index:1;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");opacity:.4}
+
+/* ── AMBIENT ORBS ── */
+.orb{position:fixed;border-radius:50%;filter:blur(120px);pointer-events:none;z-index:0}
+.o1{width:600px;height:600px;background:rgba(255,45,85,.08);top:-200px;left:-100px;animation:drift1 18s ease-in-out infinite}
+.o2{width:500px;height:500px;background:rgba(255,149,0,.05);bottom:-150px;right:-100px;animation:drift2 22s ease-in-out infinite}
+.o3{width:350px;height:350px;background:rgba(10,132,255,.04);top:40%;left:35%;animation:drift3 15s ease-in-out infinite}
+@keyframes drift1{0%,100%{transform:translate(0,0)}50%{transform:translate(60px,40px)}}
+@keyframes drift2{0%,100%{transform:translate(0,0)}50%{transform:translate(-50px,-60px)}}
+@keyframes drift3{0%,100%{transform:translate(0,0)}50%{transform:translate(30px,-40px)}}
+
+/* ── GRID LINES ── */
+.grid-lines{position:fixed;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.018) 1px,transparent 1px);background-size:80px 80px;mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black 30%,transparent 100%)}
+
+/* ── MAIN ── */
+main{position:relative;z-index:2;height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;padding-bottom:max(24px,var(--safe-bot))}
+
+/* ── STATUS PILL ── */
+.status-pill{display:inline-flex;align-items:center;gap:7px;padding:6px 16px;border-radius:20px;background:rgba(255,149,0,.1);border:1px solid rgba(255,149,0,.25);margin-bottom:28px;animation:fadeUp .8s ease both}
+.s-dot{width:7px;height:7px;border-radius:50%;background:var(--ora);animation:blink 1.6s ease-in-out infinite;flex-shrink:0}
+@keyframes blink{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.3;transform:scale(1.5)}}
+.s-txt{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ora)}
+
+/* ── LOGO ── */
+.logo{font-family:'Unbounded',sans-serif;font-size:13px;font-weight:900;background:var(--fire);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:.15em;margin-bottom:20px;animation:fadeUp .8s .1s ease both}
+
+/* ── ICON ── */
+.main-icon{font-size:clamp(56px,12vw,80px);margin-bottom:16px;display:block;animation:float 4s ease-in-out infinite,fadeUp .8s .2s ease both;filter:drop-shadow(0 0 40px rgba(255,149,0,.3))}
+@keyframes float{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-16px) rotate(3deg)}}
+
+/* ── HEADLINE ── */
+h1{font-family:'Unbounded',sans-serif;font-size:clamp(24px,7vw,48px);font-weight:900;letter-spacing:-.04em;line-height:1.05;text-align:center;margin-bottom:12px;animation:fadeUp .8s .3s ease both}
+.hl{background:var(--fire);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+
+/* ── SUBTITLE ── */
+.sub{font-size:clamp(13px,2.5vw,16px);color:var(--t2);text-align:center;max-width:400px;line-height:1.8;margin-bottom:32px;animation:fadeUp .8s .4s ease both;font-weight:300}
+.sub strong{color:var(--t1);font-weight:500}
+
+/* ── COUNTDOWN ── */
+.cd-wrap{display:flex;gap:10px;margin-bottom:36px;animation:fadeUp .8s .5s ease both}
+.cd-box{background:linear-gradient(160deg,rgba(255,255,255,.07),rgba(255,255,255,.02));border:1px solid var(--border2);border-radius:16px;padding:14px 16px;text-align:center;min-width:68px;position:relative;overflow:hidden}
+.cd-box::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.15),transparent)}
+.cd-num{font-family:'Unbounded',sans-serif;font-size:clamp(22px,5vw,32px);font-weight:900;background:var(--fire);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;display:block;min-width:2ch;text-align:center}
+.cd-lbl{font-size:8px;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;margin-top:4px;display:block}
+.cd-sep{font-family:'Unbounded',sans-serif;font-size:24px;color:var(--t3);align-self:center;padding-bottom:16px;animation:sep 1s ease-in-out infinite alternate}
+@keyframes sep{from{opacity:.3}to{opacity:1}}
+.cd-done{font-family:'Unbounded',sans-serif;font-size:14px;color:var(--ora);text-align:center;animation:fadeUp .5s ease both}
+
+/* ── PROGRESS BAR ── */
+.prog-wrap{width:100%;max-width:340px;margin-bottom:32px;animation:fadeUp .8s .6s ease both}
+.prog-label{display:flex;justify-content:space-between;font-size:10px;color:var(--t3);margin-bottom:7px;letter-spacing:.04em}
+.prog-track{height:4px;background:rgba(255,255,255,.06);border-radius:4px;overflow:hidden;position:relative}
+.prog-fill{height:100%;background:var(--fire);border-radius:4px;width:0%;transition:width 1s ease;position:relative}
+.prog-fill::after{content:'';position:absolute;right:0;top:0;bottom:0;width:40px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.4));animation:shine 2s ease-in-out infinite}
+@keyframes shine{0%,100%{opacity:0}50%{opacity:1}}
+
+/* ── FEATURES ── */
+.features{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:28px;animation:fadeUp .8s .7s ease both}
+.feat{display:flex;align-items:center;gap:6px;padding:7px 13px;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:10px;font-size:11px;color:var(--t2)}
+.feat span{font-size:14px}
+
+/* ── SOCIAL ── */
+.social{display:flex;gap:8px;animation:fadeUp .8s .8s ease both}
+.soc-btn{width:40px;height:40px;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:17px;text-decoration:none;transition:all .18s;color:var(--t1)}
+.soc-btn:hover{background:rgba(255,45,85,.1);border-color:rgba(255,45,85,.3);transform:translateY(-3px)}
+
+/* ── BOTTOM ── */
+.bottom{position:fixed;bottom:max(14px,var(--safe-bot));left:0;right:0;text-align:center;font-size:10px;color:var(--t3);z-index:3;letter-spacing:.04em}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
+/* PARTICLE CANVAS */
+#particles{position:fixed;inset:0;z-index:0;pointer-events:none}
+</style>
+</head>
+<body>
+
+<div class="orb o1"></div>
+<div class="orb o2"></div>
+<div class="orb o3"></div>
+<div class="grid-lines"></div>
+<canvas id="particles"></canvas>
+
+<main>
+  <div class="logo">RAFFLE</div>
+  <div class="status-pill"><div class="s-dot"></div><span class="s-txt">Bakım Modu Aktif</span></div>
+  <span class="main-icon">🔧</span>
+  <h1>Biraz <span class="hl">Sabır</span><br>Lütfen</h1>
+  <p class="sub">Siteyi daha iyi hale getirmek için çalışıyoruz.<br><strong>Kısa süre içinde geri döneceğiz.</strong></p>
+
+  <div class="cd-wrap" id="cdWrap">
+    <div class="cd-box"><span class="cd-num" id="cdH">00</span><span class="cd-lbl">Saat</span></div>
+    <div class="cd-sep">:</div>
+    <div class="cd-box"><span class="cd-num" id="cdM">00</span><span class="cd-lbl">Dakika</span></div>
+    <div class="cd-sep">:</div>
+    <div class="cd-box"><span class="cd-num" id="cdS">00</span><span class="cd-lbl">Saniye</span></div>
+  </div>
+
+  <div class="prog-wrap">
+    <div class="prog-label"><span>İlerleme</span><span id="progPct">Hesaplanıyor...</span></div>
+    <div class="prog-track"><div class="prog-fill" id="progFill"></div></div>
+  </div>
+
+  <div class="features">
+    <div class="feat"><span>🎲</span> Çekiliş Sistemi</div>
+    <div class="feat"><span>⚡</span> Hız İyileştirme</div>
+    <div class="feat"><span>🔒</span> Güvenlik Güncellemesi</div>
+  </div>
+
+  <div class="social">
+    <a class="soc-btn" href="#" title="Instagram">📸</a>
+    <a class="soc-btn" href="#" title="Twitter/X">🐦</a>
+    <a class="soc-btn" href="#" title="Telegram">✈️</a>
+  </div>
+</main>
+
+<div class="bottom">RAFFLE © 2025 — Çok yakında geri döneceğiz</div>
+
+<script type="module">
+import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import{initializeFirestore,doc,onSnapshot}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const FB=initializeApp({apiKey:"AIzaSyAIFpdDza_jwo0W4uQ_wAiTL3jvFLGmFzU",authDomain:"it-s-time-for-the-draw.firebaseapp.com",projectId:"it-s-time-for-the-draw"});
+const db=initializeFirestore(FB,{experimentalAutoDetectLongPolling:true});
+
+// ── PARTICLE BG ──
+(function(){
+  const c=document.getElementById("particles");
+  if(!c)return;
+  const ctx=c.getContext("2d");
+  let W,H,pts=[];
+  function resize(){W=c.width=innerWidth;H=c.height=innerHeight;pts=Array.from({length:40},()=>({x:Math.random()*W,y:Math.random()*H,r:.5+Math.random()*1.5,vx:(Math.random()-.5)*.3,vy:-(Math.random()*.4+.1),a:Math.random(),da:.002+Math.random()*.005}));}
+  resize();window.addEventListener("resize",resize,{passive:true});
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    pts.forEach(p=>{
+      p.a+=p.da;if(p.a>1||p.a<0)p.da*=-1;
+      p.x+=p.vx;p.y+=p.vy;
+      if(p.y<-5)p.y=H+5;if(p.x<0)p.x=W;if(p.x>W)p.x=0;
+      ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(255,${100+Math.floor(p.a*100)},${50+Math.floor(p.a*50)},${p.a*.4})`;
+      ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// ── COUNTDOWN ──
+let endsAt=null,startedAt=null;
+function updateCD(){
+  if(!endsAt){
+    ["cdH","cdM","cdS"].forEach(id=>{const e=document.getElementById(id);if(e)e.textContent="--";});
+    const pp=document.getElementById("progPct");if(pp)pp.textContent="Hesaplanıyor...";
+    return;
+  }
+  const now=Date.now();
+  const total=endsAt-startedAt;
+  const left=endsAt-now;
+  if(left<=0){
+    ["cdH","cdM","cdS"].forEach(id=>{const e=document.getElementById(id);if(e)e.textContent="00";});
+    const pf=document.getElementById("progFill");if(pf)pf.style.width="100%";
+    const pp=document.getElementById("progPct");if(pp)pp.textContent="Tamamlandı!";
+    return;
+  }
+  const h=Math.floor(left/3600000);
+  const m=Math.floor(left%3600000/60000);
+  const s=Math.floor(left%60000/1000);
+  const cdH=document.getElementById("cdH"),cdM=document.getElementById("cdM"),cdS=document.getElementById("cdS");
+  if(cdH)cdH.textContent=String(h).padStart(2,"0");
+  if(cdM)cdM.textContent=String(m).padStart(2,"0");
+  if(cdS)cdS.textContent=String(s).padStart(2,"0");
+  if(total>0){
+    const pct=Math.round((1-left/total)*100);
+    const pf=document.getElementById("progFill");if(pf)pf.style.width=pct+"%";
+    const pp=document.getElementById("progPct");if(pp)pp.textContent="%"+pct+" tamamlandı";
+  }
+}
+setInterval(updateCD,1000);
+
+// ── FIRESTORE LISTENER ──
+onSnapshot(doc(db,"config","maintenance"),snap=>{
+  if(!snap.exists()||!snap.data().active){
+    // Bakım bitti - ana siteye yönlendir
+    window.location.href="/";
+    return;
+  }
+  const d=snap.data();
+  // Update message
+  const sub=document.querySelector(".sub");
+  if(sub&&d.message){sub.innerHTML=d.message.replace(/\n/g,"<br>");}
+  // Update countdown
+  if(d.endsAt){
+    endsAt=new Date(d.endsAt).getTime();
+    startedAt=d.startedAt?new Date(d.startedAt).getTime():Date.now();
+  }
+  updateCD();
+});
+</script>
+</body>
+</html>
