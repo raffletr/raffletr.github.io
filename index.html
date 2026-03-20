@@ -13,6 +13,7 @@
 <link rel="manifest" href="/manifest.json">
 <link rel="apple-touch-icon" href="/icon-192.png">
 <title>Raffle</title>
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;700;900&family=Outfit:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -411,7 +412,8 @@ textarea.inp{resize:vertical}
     <div id="ncBtn" style="width:28px;height:28px;border-radius:8px;background:var(--card);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;flex-shrink:0;position:relative">&#128276;<div id="ncDot" style="position:absolute;top:3px;right:3px;width:7px;height:7px;background:var(--red);border-radius:50%;border:1.5px solid var(--bg);display:none"></div></div>
     <div id="settBtn" style="width:28px;height:28px;border-radius:8px;background:var(--card);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;flex-shrink:0">&#9881;&#65039;</div>
     <div id="themeBtn" style="width:28px;height:28px;border-radius:8px;background:var(--card);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;flex-shrink:0">&#127769;</div>
-  </div><button id="installBtn" class="btn ghost sm hidden" style="font-size:10px;padding:5px 8px;flex-shrink:0">📲 Yukle</button>
+    <button id="installBtn" class="btn ghost sm hidden" style="font-size:10px;padding:4px 8px;flex-shrink:0">📲</button>
+  </div>
 </nav>
 
 <!-- NOTIFICATION CENTER -->
@@ -656,6 +658,17 @@ textarea.inp{resize:vertical}
     <div class="gc pp-form-card" id="ppFormCard">
       <div class="pp-form-title">Cekilise Katil</div>
       <div class="pp-form-sub" id="ppFormSub">Sadece @gmail.com kabul edilir.</div>
+      <!-- Cloudflare Turnstile -->
+      <div id="cfWrap" style="margin-bottom:12px;display:flex;justify-content:center;display:none">
+        <div class="cf-turnstile" id="cfWidget" data-sitekey="0x4AAAAAACswDRAnhAQR0tuJmCTSjgAM00E" data-theme="dark" data-size="normal"></div>
+      </div>
+      <!-- Math Captcha (backup) -->
+      <div class="captcha-box" id="ppCaptchaBox" style="display:none">
+        <div style="font-size:14px;font-weight:700;color:var(--yel);margin-bottom:7px" id="ppCaptchaQ"></div>
+        <input class="inp" id="ppCaptchaAns" type="number" placeholder="Cevabiniz" style="width:110px">
+      </div>
+      <!-- Honeypot -->
+      <input type="text" id="ppHoney" style="display:none;position:absolute;left:-9999px" tabindex="-1" autocomplete="off" aria-hidden="true">
       <div class="field"><label class="lbl">Ad Soyad *</label><input class="inp" id="ppN" placeholder="Ahmet Yilmaz"></div>
       <div class="field"><label class="lbl">Gmail *</label><input class="inp" type="email" id="ppE" placeholder="ahmet@gmail.com"></div>
       <div class="field"><label class="lbl">Instagram</label><input class="inp" id="ppI" placeholder="@kullanici"></div>
@@ -923,21 +936,53 @@ onAuthStateChanged(auth,user=>{
     if(!prDone){prDone=true;loadProfile(urlP);}
     return;
   }
-  const nr=document.getElementById("navR");
+  // ── NAV kullanıcı butonları - innerHTML kullanma, appendChild ile ekle ──
+  // Önce eski ava/out butonlarını kaldır (innerHTML sıfırlamadan)
+  document.getElementById("myAva")?.remove();
+  document.getElementById("outBtn")?.remove();
+  document.getElementById("myName")?.remove();
+
   if(ME){
     const nm=(ME.displayName||ME.email||"K").trim();
     const ini=nm.split(" ").map(w=>w[0]||"").join("").slice(0,2).toUpperCase()||"?";
-    nr.innerHTML='<span style="font-size:11px;color:var(--t2);max-width:70px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+nm.split(" ")[0]+'</span><div class="ava" id="myAva">'+ini+'</div><button class="btn ghost sm" id="outBtn" style="font-size:10px;padding:5px 8px">Cikis</button>';
-    document.getElementById("outBtn").addEventListener("click",()=>signOut(auth));
-    document.getElementById("myAva").addEventListener("click",()=>{
-      const sc=(ME.displayName||ME.email||"u").replace(/\s+/g,"_").replace(/\W/g,"").toLowerCase();
-      window.open(location.origin+location.pathname+"?p="+sc,"_blank");
+    const nr=document.getElementById("navR");
+
+    // İsim span
+    const nmSpan=document.createElement("span");
+    nmSpan.id="myName";
+    nmSpan.style.cssText="font-size:11px;color:var(--t2);max-width:70px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex-shrink:0";
+    nmSpan.textContent=nm.split(" ")[0];
+
+    // Avatar
+    const ava=document.createElement("div");
+    ava.id="myAva";ava.className="ava";ava.textContent=ini;
+    ava.style.cursor="pointer";
+    ava.addEventListener("click",()=>{
+      window.open(location.origin+location.pathname+"?p="+ME.uid,"_blank");
     });
+
+    // Çıkış butonu
+    const outB=document.createElement("button");
+    outB.id="outBtn";outB.className="btn ghost sm";
+    outB.style.cssText="font-size:10px;padding:4px 8px;flex-shrink:0";
+    outB.textContent="Çıkış";
+    outB.addEventListener("click",()=>signOut(auth));
+
+    // installBtn'den ÖNCE ekle (sona değil, install öncesine)
+    const installBtn=document.getElementById("installBtn");
+    if(installBtn){
+      nr.insertBefore(nmSpan,installBtn);
+      nr.insertBefore(ava,installBtn);
+      nr.insertBefore(outB,installBtn);
+    } else {
+      nr.appendChild(nmSpan);
+      nr.appendChild(ava);
+      nr.appendChild(outB);
+    }
+
     if(document.getElementById("dName"))document.getElementById("dName").textContent=nm.split(" ")[0];
     const cb=document.getElementById("cleanBtn");
     if(cb){if(ME.email==="necron.offical@gmail.com")cb.classList.remove("hidden");else cb.classList.add("hidden");}
-  } else {
-    nr.innerHTML="";
   }
   updateCreate();
 });
@@ -1340,15 +1385,11 @@ document.getElementById("pubBtn").addEventListener("click",async()=>{
   const ejsT=document.getElementById("ejsT").value.trim();
   const ejsK=document.getElementById("ejsK").value.trim();
   const safeC=(ME.displayName||ME.email||"u").replace(/\s+/g,"_").replace(/\W/g,"").toLowerCase();
-  const safeG=name.replace(/\s+/g,"_").replace(/\W/g,"").toLowerCase();
-  const drawId=safeC+"_"+safeG;
   const btn=document.getElementById("pubBtn");btn.disabled=true;btn.innerHTML='<span class="spin"></span> Olusturuluyor...';
   try{
     const eq=query(collection(db,"giveaways"),where("creatorId","==",ME.uid));
     const es=await getDocs(eq);
     if(es.size>=10){toast("Max 10 cekilis!","err");return;}
-    const existCheck=await getDoc(doc(db,"giveaways",drawId));
-    if(existCheck.exists()){toast("Bu isimde cekilis zaten var! Farkli bir isim dene.","warn");return;}
     const maxP=parseInt(document.getElementById("cMaxP").value)||0;
     const drawRef=await addDoc(collection(db,"giveaways"),{
       creatorId:ME.uid,creatorName:safeC,drawName:safeG,prizes,endTime,desc,
@@ -1423,7 +1464,7 @@ async function openMgr(drawId,drawName,prizes){
       ps.querySelectorAll(".rm-part").forEach(btn=>btn.addEventListener("click",async()=>{
         if(!confirm((btn.dataset.name||"Bu katilimci")+" silinsin mi?"))return;
         try{
-          await deleteDoc(doc(db,"giveaways/"+mgrId+"/participants",btn.dataset.id));
+          await deleteDoc(doc(db,"giveaways",mgrId,"participants",btn.dataset.id));
           await updateDoc(doc(db,"giveaways",mgrId),{partCount:increment(-1)});
           toast("Katilimci cikarildi");
         }catch(e){toast("Hata: "+e.message,"err");}
@@ -1472,7 +1513,7 @@ document.getElementById("rerollBtn")?.addEventListener("click",async()=>{
       }
     });
     if(!lastWinner){toast("Kazanan bulunamadi","err");return;}
-    await updateDoc(doc(db,"giveaways/"+mgrId+"/participants",lastWinner.id),{isWinner:false,wonPrize:null,wonAt:null});
+    await updateDoc(doc(db,"giveaways",mgrId,"participants",lastWinner.id),{isWinner:false,wonPrize:null,wonAt:null});
     await updateDoc(doc(db,"giveaways",mgrId),{winCount:increment(-1)});
     mgrWin--;
     mgrWin=Math.max(0,mgrWin);
@@ -1549,7 +1590,7 @@ document.getElementById("drawBtn").addEventListener("click",async()=>{
   const btn=document.getElementById("drawBtn");btn.disabled=true;btn.style.opacity=".5";
   runSlot(mgrParts,prize,async(winner,wi)=>{
     mgrWin++;
-    try{await updateDoc(doc(db,"giveaways/"+mgrId+"/participants",winner.id),{isWinner:true,wonPrize:prize,wonAt:new Date()});}catch(e){}
+    try{await updateDoc(doc(db,"giveaways",mgrId,"participants",winner.id),{isWinner:true,wonPrize:prize,wonAt:new Date()});}catch(e){}
     try{await updateDoc(doc(db,"giveaways",mgrId),{winCount:increment(1)});}catch(e){}
     mgrParts.splice(wi,1);
     const pw=document.getElementById("pw_"+ti);if(pw){pw.className="prize-winner";pw.textContent=winner.name||winner.email||"—";}
@@ -1770,7 +1811,7 @@ function runLive(){
         document.getElementById("liveWP").textContent=prize;
         document.getElementById("liveRev").style.display="block";
         boom();liveWin++;mgrParts.splice(wi,1);
-        try{await updateDoc(doc(db,"giveaways/"+mgrId+"/participants",winner.id),{isWinner:true,wonPrize:prize,wonAt:new Date()});}catch(e){}
+        try{await updateDoc(doc(db,"giveaways",mgrId,"participants",winner.id),{isWinner:true,wonPrize:prize,wonAt:new Date()});}catch(e){}
         try{await updateDoc(doc(db,"giveaways",mgrId),{winCount:increment(1)});}catch(e){}
         const pw=document.getElementById("pw_"+(liveWin-1));if(pw){pw.className="prize-winner";pw.textContent=winner.name||winner.email||"—";}
         // Email
@@ -1965,8 +2006,67 @@ async function initPP(){
         if(sub)sub.textContent="Sadece @gmail.com. Max "+dw.maxParticipants+" kisi katilabilir.";
       }
       // Store draw info for support
-      window._ppDrawName=dw.drawName||drawId;
+      window._ppDrawName=dw.drawNameDisplay||dw.drawName||drawId;
       window._ppOrgEmailFinal=dw.organizerEmail||"";
+
+      // ── Rules ──
+      if(dw.rules){
+        const rb=document.getElementById("ppRulesBox");
+        if(rb){
+          rb.style.display="block";
+          const rl=document.getElementById("ppRulesList");
+          if(rl)rl.innerHTML=dw.rules.split("\n").filter(r=>r.trim()).map(r=>'<li>'+r.replace(/^\d+\.\s*/,"")+'</li>').join("");
+        }
+      }
+      // ── Social requirement ──
+      if(dw.socialRequirement){
+        const sr=document.getElementById("ppSocialReq");
+        if(sr){sr.style.display="block";sr.innerHTML="📱 <b>Şart:</b> "+dw.socialRequirement;}
+      }
+      // ── Age requirement ──
+      if(dw.ageRequired){
+        const ar=document.getElementById("ppAgeRow");
+        if(ar)ar.style.display="block";
+      }
+      // ── Max participants progress bar ──
+      if(dw.maxParticipants&&dw.maxParticipants>0){
+        window._ppMaxP=dw.maxParticipants;
+        const pw=document.getElementById("ppProgWrap");if(pw)pw.style.display="block";
+        const pm=document.getElementById("ppProgMax");if(pm)pm.textContent="Max: "+dw.maxParticipants;
+        const sub=document.getElementById("ppFormSub");
+        if(sub)sub.textContent="Sadece @gmail.com. Max "+dw.maxParticipants+" kişi.";
+      }
+      // ── QR code ──
+      const ppQr=document.getElementById("ppQrBox");
+      if(ppQr){
+        ppQr.style.display="block";
+        const ppQrCnv=document.getElementById("ppQrCnv");
+        if(ppQrCnv)makeQR(ppQrCnv,location.href,100);
+      }
+      // ── Share buttons ──
+      const ppShr=document.getElementById("ppShareRow");
+      if(ppShr){
+        ppShr.style.display="flex";
+        ppShr.innerHTML=[
+        '<button class="btn ghost sm" id="ppShrWA">💬 WA</button>',
+        '<button class="btn ghost sm" id="ppShrCp">📋 Link</button>',
+        '<button class="btn ghost sm" id="ppShrX">🐦 X</button>'
+      ].join("");
+      document.getElementById("ppShrWA")?.addEventListener("click",()=>window.open("https://wa.me/?text="+encodeURIComponent(location.href),"_blank"));
+      document.getElementById("ppShrCp")?.addEventListener("click",()=>navigator.clipboard.writeText(location.href).then(()=>toast("Kopyalandı!")));
+      document.getElementById("ppShrX")?.addEventListener("click",()=>window.open("https://twitter.com/intent/tweet?text="+encodeURIComponent("Cekilise katil: "+location.href),"_blank"))
+      }
+
+      // Show Cloudflare Turnstile
+      const cfW=document.getElementById("cfWrap");
+      if(cfW)cfW.style.display="flex";
+      // Math captcha if enabled
+      if(dw.captchaEnabled){
+        const cb=document.getElementById("ppCaptchaBox");if(cb)cb.style.display="block";
+        const a=~~(Math.random()*20)+1,b=~~(Math.random()*20)+1;
+        window._ppCaptchaAns=a+b;
+        const cq=document.getElementById("ppCaptchaQ");if(cq)cq.textContent=a+" + "+b+" = ?";
+      }
       // Prizes
       const medals=["🥇","🥈","🥉"],cls=["pp-p1","pp-p2","pp-p3"],lbl=["Birinci Odul","Ikinci Odul","Ucuncu Odul"];
       if((dw.prizes||[]).length){
@@ -1975,6 +2075,52 @@ async function initPP(){
           pc.classList.remove("hidden");
           pc.innerHTML=dw.prizes.map((p,i)=>'<div class="pp-prize '+(cls[i]||"")+'"><div class="pp-medal">'+(medals[i]||"🎁")+'</div><div><div class="pp-pl">'+(lbl[i]||((i+1)+". Odul"))+'</div><div class="pp-pv">'+p+'</div></div></div>').join("");
         }
+      }
+      // Rules
+      if(dw.rules){
+        const rb=document.getElementById("ppRulesBox");
+        if(rb){
+          rb.style.display="block";
+          const rl=document.getElementById("ppRulesList");
+          if(rl)rl.innerHTML=dw.rules.split("\n").filter(r=>r.trim()).map(r=>'<li>'+r.replace(/^\d+\.\s*/,"")+'</li>').join("");
+        }
+      }
+      // Social requirement
+      if(dw.socialRequirement){
+        const sr=document.getElementById("ppSocialReq");
+        if(sr){sr.style.display="block";sr.innerHTML="📱 <b>Şart:</b> "+dw.socialRequirement;}
+      }
+      // Age checkbox
+      if(dw.ageRequired){
+        const ar=document.getElementById("ppAgeRow");
+        if(ar)ar.style.display="block";
+      }
+      // Progress bar (max participants)
+      if(dw.maxParticipants&&dw.maxParticipants>0){
+        window._ppMaxP=dw.maxParticipants;
+        const pw=document.getElementById("ppPartBar");
+        if(pw)pw.classList.remove("hidden");
+        const pm=document.getElementById("ppPartBarMax");
+        if(pm)pm.textContent="/ "+dw.maxParticipants;
+      }
+      // QR code
+      const qrB=document.getElementById("ppQrBox");
+      if(qrB){
+        qrB.classList.remove("hidden");
+        const qrC=document.getElementById("ppQrCanvas");
+        if(qrC)genQR(qrC,location.href,100);
+      }
+      // Cloudflare Turnstile - show widget
+      const cfW2=document.getElementById("cfWrap");
+      if(cfW2)cfW2.style.display="flex";
+      // Math captcha if enabled
+      if(dw.captchaEnabled){
+        const cb=document.getElementById("ppCaptchaBox");
+        if(cb)cb.style.display="block";
+        const a=~~(Math.random()*20)+1,b2=~~(Math.random()*20)+1;
+        window._ppCaptchaAns=a+b2;
+        const cq=document.getElementById("ppCaptchaQ");
+        if(cq)cq.textContent=a+" + "+b2+" = ?";
       }
       // Timer
       if(dw.endTime){
@@ -2002,6 +2148,13 @@ async function initPP(){
   ppUnsub=onSnapshot(collection(db,"giveaways/"+drawId+"/participants"),snap=>{
     const maxPP=(window._ppMaxP||0);
     document.getElementById("ppCnt").textContent=maxPP>0?snap.size+"/"+maxPP:snap.size;
+    // Update progress bar
+    if(maxPP>0){
+      const pf=document.getElementById("ppProgFill");if(pf)pf.style.width=Math.min(100,Math.round(snap.size/maxPP*100))+"%";
+      const pl=document.getElementById("ppProgLbl");if(pl)pl.textContent=snap.size+" katılımcı";
+    } else {
+      const pl=document.getElementById("ppProgLbl");if(pl)pl.textContent=snap.size+" katılımcı";
+    }
     // Show winners
     const winners=[];snap.forEach(d=>{const dt=d.data();if(dt.isWinner)winners.push(dt);});
     if(winners.length>0){
@@ -2037,14 +2190,36 @@ async function initPP(){
         document.getElementById("ppAlr").style.display="block";
         return;
       }
+      // Honeypot bot check
+      if(document.getElementById("ppHoney")?.value){console.warn("Bot detected");return;}
+      // Cloudflare Turnstile check
+      const cfToken=typeof turnstile!=="undefined"?turnstile.getResponse(document.getElementById("cfWidget")):null;
+      if(!cfToken&&location.hostname!=="localhost"&&!location.hostname.startsWith("192.168")){
+        toast("Lütfen güvenlik doğrulamasını tamamlayın (robot değilim)!","warn");
+        return;
+      }
+      // Math captcha check
+      if(window._ppCaptchaAns!==undefined){
+        const ans=parseInt(document.getElementById("ppCaptchaAns")?.value||"");
+        if(isNaN(ans)||ans!==window._ppCaptchaAns){toast("Yanlış captcha cevabı!","err");return;}
+      }
       const name=document.getElementById("ppN").value.trim();
       const email=document.getElementById("ppEmail")?.value.trim().toLowerCase()||document.getElementById("ppE").value.trim().toLowerCase();
       const insta=document.getElementById("ppI").value.trim();
       if(!name){toast("Ad Soyad zorunlu!","err");return;}
-      if(name.split(/\s+/).length<2){toast("Ad ve soyad girin!","err");return;}
-      if(!email){toast("Email zorunlu!","err");return;}
+      if(name.split(/\s+/).length<2){toast("Ad ve Soyad girin (iki kelime)!","err");return;}
+      if(!email){toast("Gmail zorunlu!","err");return;}
       const gmailReg=/^[a-zA-Z0-9._%+\-]+@gmail\.com$/;
       if(!gmailReg.test(email)){toast("Sadece @gmail.com kabul edilir!","err");return;}
+      // Age check
+      const ageRow=document.getElementById("ppAgeRow");
+      if(ageRow&&ageRow.style.display!=="none"&&!document.getElementById("ppAgeChk")?.checked){
+        toast("18+ yaş onayı gereklidir!","warn");return;
+      }
+      // Rules agree check
+      if(!document.getElementById("ppAgreeChk")?.checked){
+        toast("Çekiliş kurallarını kabul etmelisiniz!","warn");return;
+      }
       joinBtn.disabled=true;joinBtn.innerHTML='<span class="spin"></span>';
       try{
         // Check max
@@ -2061,7 +2236,9 @@ async function initPP(){
         const qd=query(collection(db,"giveaways/"+drawId+"/participants"),where("email","==",email));
         const dup=await getDocs(qd);
         if(!dup.empty){
-          localStorage.setItem(lsKey,"1");window._ppJoinedEmail=email;
+          localStorage.setItem(lsKey,"1");
+        // Reset Turnstile for potential re-use
+        if(typeof turnstile!=="undefined")try{turnstile.reset();}catch(e){}window._ppJoinedEmail=email;
           document.getElementById("ppFormCard").classList.add("hidden");
           document.getElementById("ppAlr").style.display="block";
           setupCancelAndSupport(drawId,lsKey,null);return;
@@ -2117,7 +2294,7 @@ function setupCancelAndSupport(drawId,lsKey,dwData){
         let found=null;
         snap.forEach(d=>{if(d.data().email===emailInput.trim().toLowerCase()&&!d.data().isWinner)found={id:d.id,...d.data()};});
         if(!found){alert("E-posta bulunamadi veya kazanan secilmis.");btn.disabled=false;btn.textContent="↩️ Katilimi İptal Et";return;}
-        await deleteDoc(doc(db,"giveaways/"+drawId+"/participants",found.id));
+        await deleteDoc(doc(db,"giveaways",drawId,"participants",found.id));
         const curSnap=await getDoc(doc(db,"giveaways",drawId));
         if(curSnap.exists()&&(curSnap.data().partCount||0)>0)await updateDoc(doc(db,"giveaways",drawId),{partCount:increment(-1)});
         localStorage.removeItem(lsKey);window._ppJoinedEmail="";
