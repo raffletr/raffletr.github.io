@@ -567,8 +567,8 @@ select.inp{cursor:pointer;background-image:none}
     <div class="dash-hdr">
       <div class="dash-t">👋 <span id="dName">—</span></div>
       <div style="display:flex;gap:6px;flex-wrap:wrap">
-        <button class="btn btn-ghost btn-sm hidden" id="maintBtn" style="color:var(--red)">🔧 Bakım</button>
-        <button class="btn btn-ghost btn-sm hidden" id="cleanBtn" style="color:var(--ora)">🧹 Temizle</button>
+        <button class="btn btn-ghost btn-sm" id="maintBtn" style="color:var(--red);display:none">🔧 Bakım</button>
+        <button class="btn btn-ghost btn-sm" id="cleanBtn" style="color:var(--ora);display:none">🧹 Temizle</button>
         <button class="btn btn-ghost btn-sm" id="refBtn">🔄 Yenile</button>
       </div>
     </div>
@@ -1181,9 +1181,9 @@ onAuthStateChanged(auth,user=>{
 
     const dn=document.getElementById("dName");if(dn)dn.textContent=nm.split(" ")[0];
     const cb=document.getElementById("cleanBtn");
-    if(cb)cb.classList.toggle("hidden",ME.email!==ADMIN);
+    if(cb)cb.style.display=ME.email===ADMIN?"inline-flex":"none";
     const mb=document.getElementById("maintBtn");
-    if(mb)mb.classList.toggle("hidden",ME.email!==ADMIN);
+    if(mb)mb.style.display=ME.email===ADMIN?"inline-flex":"none";
   }
   updateCreate();
 });
@@ -1646,7 +1646,8 @@ document.getElementById("maintStartBtn")?.addEventListener("click",async()=>{
   btn.disabled=true;btn.innerHTML='<span class="spin"></span> Başlatılıyor...';
   const msg=document.getElementById("maintMsgInp")?.value.trim()||"Site şu an bakımda. Kısa süre içinde döneceğiz! 🚀";
   const endVal=document.getElementById("maintEndInp")?.value;
-  const endsAt=endVal?new Date(endVal).toISOString():"";
+  let endsAt="";
+  if(endVal){try{const dt=new Date(endVal);if(!isNaN(dt.getTime()))endsAt=dt.toISOString();}catch(e){}}
   try{
     await setDoc(doc(db,"config","maintenance"),{
       active:true,message:msg,endsAt,
