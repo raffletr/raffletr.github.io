@@ -13,14 +13,20 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{
-  --bg:#060610;--bg2:#0c0c1e;--bg3:#12122a;
+  --bg:#060610;--bg2:#0c0c1e;--bg3:#12122a;--bg4:#1a1a32;
   --card:rgba(255,255,255,.04);--card2:rgba(255,255,255,.07);--card3:rgba(255,255,255,.10);
+  --c0:rgba(255,255,255,.04);--c1:rgba(255,255,255,.07);--c2:rgba(255,255,255,.11);--c3:rgba(255,255,255,.17);
   --border:rgba(255,255,255,.07);--border2:rgba(255,255,255,.12);--border3:rgba(255,255,255,.18);
-  --t1:#f0f0ff;--t2:#8888bb;--t3:#44446a;
+  --b0:rgba(255,255,255,.04);--b1:rgba(255,255,255,.07);--b2:rgba(255,255,255,.12);--b3:rgba(255,255,255,.18);
+  --t1:#f0f0ff;--t2:#8888bb;--t3:#44446a;--t4:#1e1e32;
   --red:#ff2d55;--ora:#ff9f0a;--yel:#ffd60a;--grn:#30d158;--blu:#0a84ff;--pur:#bf5af2;
+  --r:#ff2d55;--o:#ff9f0a;--y:#ffd60a;--g:#30d158;--b:#0a84ff;--p:#bf5af2;
   --fire:linear-gradient(135deg,#ff2d55,#ff9500);
   --gold:linear-gradient(135deg,#ffd60a,#ff9500);
-  --nav:52px;--bot:58px;--safe-top:env(safe-area-inset-top,0px);--safe-bot:env(safe-area-inset-bottom,0px);
+  --cool:linear-gradient(135deg,#0a84ff,#5856d6);
+  --nav:54px;--bot:64px;
+  --safe-top:env(safe-area-inset-top,0px);--safe-bot:env(safe-area-inset-bottom,0px);
+  --st:env(safe-area-inset-top,0px);--sb:env(safe-area-inset-bottom,0px);
 }
 [data-lt]{
   --bg:#f4f4fb;--bg2:#eeeef8;--bg3:#e8e8f4;
@@ -635,6 +641,352 @@ svg[data-lucide]{width:1em;height:1em;stroke:currentColor;fill:none;stroke-width
 .cat.on{color:#fff;border-color:rgba(255,58,92,.38);background:rgba(255,58,92,.1)}
 .cat svg[data-lucide]{width:12px!important;height:12px!important;flex-shrink:0}
 
+
+/* ─── DISCOVER PAGE CSS ─── */
+.disc-hero{padding:22px 14px 14px;background:radial-gradient(ellipse 90% 60% at 50% 0%,rgba(255,45,85,.12) 0%,transparent 70%);border-bottom:1px solid var(--b1)}
+.disc-live{display:inline-flex;align-items:center;gap:5px;background:rgba(255,45,85,.1);border:1px solid rgba(255,45,85,.22);border-radius:20px;padding:4px 12px;font-size:10px;font-weight:700;color:var(--red);margin-bottom:10px;letter-spacing:.05em}
+.disc-h1{font-family:'Unbounded',sans-serif;font-size:clamp(20px,6vw,34px);font-weight:900;letter-spacing:-.05em;line-height:1.05;margin-bottom:6px}
+.disc-hl{background:var(--fire);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.disc-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:12px}
+.ds{background:var(--card);border:1px solid var(--border);border-radius:11px;padding:9px 5px;text-align:center}
+.ds-n{font-family:'Unbounded',sans-serif;font-size:17px;font-weight:800;background:var(--fire);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.ds-l{font-size:8px;color:var(--t3);text-transform:uppercase;letter-spacing:.07em;margin-top:2px}
+.disc-body{padding:11px 13px 0}
+.disc-top-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px;gap:8px}
+.srch-w{position:relative;flex:1}
+.srch-inp{padding-left:36px!important}
+.srch-clr{position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--t3);cursor:pointer;display:none;padding:4px;border-radius:5px;align-items:center}
+.srch-clr.on{display:flex}
+.srch-clr:hover{color:var(--red)}
+.frow{display:flex;gap:5px;margin-bottom:11px}
+.fsel{background:var(--card);border:1.5px solid var(--border);border-radius:10px;padding:7px 10px;color:var(--t1);font-family:'Outfit',sans-serif;font-size:11px;outline:none;cursor:pointer;-webkit-appearance:none;flex:1;min-width:0}
+.disc-count{font-size:10px;color:var(--t3);white-space:nowrap;display:flex;align-items:center}
+.disc-count b{color:var(--t1)}
+/* ─── CARD CSS ─── */
+.card-img{width:100%;overflow:hidden;border-radius:16px 16px 0 0;background:var(--bg3);position:relative}
+.card-img-em{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--t3)}
+.card-img-real{width:100%;height:100%;object-fit:cover;display:block;position:absolute;inset:0}
+.card-body{padding:11px}
+.card-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:5px;gap:6px}
+.card-ava{width:26px;height:26px;border-radius:7px;background:var(--fire);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;color:#fff;cursor:pointer;overflow:hidden}
+.card-cn{font-weight:600;font-size:11px;color:var(--t2);cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100px;transition:color .13s}
+.card-cn:hover{color:var(--blu)}
+.card-cat{font-size:9px;color:var(--t3)}
+.card-bdgs{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:5px}
+.card-name{font-family:'Unbounded',sans-serif;font-size:12px;font-weight:700;letter-spacing:-.02em;line-height:1.2;margin-bottom:4px}
+.card-desc{font-size:11px;color:var(--t3);margin-bottom:6px;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.card-prizes{display:flex;flex-direction:column;gap:3px;margin-bottom:6px}
+.card-prize{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--t2)}
+.card-prog{height:3px;background:rgba(255,255,255,.06);border-radius:3px;margin-bottom:6px;overflow:hidden}
+.card-prog-f{height:100%;background:var(--fire);border-radius:3px}
+.card-footer{display:flex;align-items:center;justify-content:space-between;gap:5px;flex-wrap:wrap}
+.card-cnt{font-size:10px;color:var(--t3);display:flex;align-items:center;gap:3px}
+.card-cnt b{color:var(--t1)}
+.card-cd{font-size:10px;font-weight:700;display:flex;align-items:center;gap:3px}
+.cd-hot{color:var(--red)}.cd-soon{color:var(--ora)}.cd-ok{color:var(--t3)}
+.card-btns{display:flex;gap:3px}
+.fav-btn{background:none;border:none;cursor:pointer;padding:4px 5px;color:var(--t3);transition:all .15s;display:flex;align-items:center;border-radius:6px}
+.fav-btn:hover,.fav-btn.on{color:var(--red)}
+/* ─── BADGES ─── */
+.bdg{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:20px;font-size:9px;font-weight:700;flex-shrink:0}
+.bdg-live{background:rgba(48,209,88,.12);color:var(--grn);border:1px solid rgba(48,209,88,.24)}
+.bdg-end{background:rgba(255,45,85,.1);color:var(--red);border:1px solid rgba(255,45,85,.2)}
+.bdg-hot{background:rgba(255,45,85,.13);color:var(--red);border:1px solid rgba(255,45,85,.28)}
+.bdg-new{background:rgba(10,132,255,.11);color:var(--blu);border:1px solid rgba(10,132,255,.24)}
+/* ─── EMPTY ─── */
+.empty{text-align:center;padding:38px 16px;grid-column:1/-1}
+.empty-i{font-size:36px;margin-bottom:9px;opacity:.4}
+.empty-t{color:var(--t3);font-size:12px;line-height:1.7}
+/* ─── STITLE ─── */
+.stl{font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--t2);margin-bottom:9px;display:flex;align-items:center;gap:6px}
+.stl::after{content:'';flex:1;height:1px;background:var(--border)}
+/* ─── SKEL/SPIN ─── */
+.skel{background:linear-gradient(90deg,var(--card) 25%,var(--card2) 50%,var(--card) 75%);background-size:200%;animation:skel 1.6s ease-in-out infinite;border-radius:8px}
+@keyframes skel{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.spin{width:16px;height:16px;border:2px solid rgba(255,255,255,.18);border-top-color:#fff;border-radius:50%;animation:sp .65s linear infinite;display:inline-block;vertical-align:middle}
+@keyframes sp{to{transform:rotate(360deg)}}
+/* ─── ANALYTICS ─── */
+.ana-wrap{max-width:700px;margin:0 auto;padding:14px 12px 0}
+.kpi4{display:grid;grid-template-columns:repeat(2,1fr);gap:7px;margin-bottom:13px}
+.kpi-b{padding:14px 10px;text-align:center}
+.kpi-ico{width:36px;height:36px;border-radius:10px;background:var(--card2);display:flex;align-items:center;justify-content:center;margin:0 auto 8px}
+.kpi-n{font-family:'Unbounded',sans-serif;font-size:22px;font-weight:800;background:var(--fire);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.kpi-l{font-size:8px;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-top:2px}
+.ana-chart{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:12px}
+.ana-chart-t{font-size:11px;font-weight:600;color:var(--t2);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.bar-chart{display:flex;align-items:flex-end;gap:5px;height:76px}
+.bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px}
+.bar-fill{width:100%;background:var(--fire);border-radius:3px 3px 0 0;min-height:2px;transition:height .6s ease}
+.bar-lbl{font-size:8px;color:var(--t3);text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;width:100%}
+.bar-val{font-size:8px;color:var(--t2);font-weight:600}
+.ana-card{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:6px;cursor:pointer;transition:background .13s}
+.ana-card:hover{background:var(--card2)}
+.ana-thumb{width:40px;height:40px;border-radius:9px;background:var(--bg3);flex-shrink:0;overflow:hidden;position:relative}
+.ana-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+/* ─── DASHBOARD ─── */
+.dash{max-width:900px;margin:0 auto;padding:14px 12px}
+.dash-hdr{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px;gap:8px;flex-wrap:wrap}
+.my-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(265px,100%),1fr));gap:8px}
+.my-card{overflow:hidden}
+.my-img{width:100%;height:60px;background:var(--bg3);display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:16px 16px 0 0;position:relative}
+.my-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.my-body{padding:10px}
+.my-name{font-family:'Unbounded',sans-serif;font-size:11px;font-weight:700;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.my-sub{font-size:10px;color:var(--t3);margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.my-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-bottom:6px}
+.my-stat{background:var(--card);border-radius:7px;padding:5px;text-align:center;border:1px solid var(--border)}
+.my-sn{font-family:'Unbounded',sans-serif;font-size:12px;font-weight:700;background:var(--fire);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.my-sl{font-size:7px;color:var(--t3);text-transform:uppercase;letter-spacing:.04em;margin-top:1px}
+.my-foot{display:flex;gap:3px;flex-wrap:wrap}
+.my-foot .btn{flex:1;font-size:9px;min-width:0;padding:6px 4px}
+/* ─── CREATE ─── */
+.cw{max-width:540px;margin:0 auto;padding:14px 12px}
+.login-card{text-align:center;padding:38px 18px}
+.tpl-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-bottom:11px}
+.tpl{padding:12px;cursor:pointer;border-radius:13px;border:1.5px solid var(--border);background:var(--card);transition:all .14s;text-align:left}
+.tpl:hover{border-color:rgba(255,45,85,.3);background:rgba(255,45,85,.05);transform:translateY(-2px)}
+.tpl-ico{width:34px;height:34px;border-radius:9px;background:var(--card2);display:flex;align-items:center;justify-content:center;margin-bottom:7px}
+.tpl-n{font-size:12px;font-weight:600}.tpl-s{font-size:10px;color:var(--t3);margin-top:2px}
+.dur-row{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px}
+.dur-btn{padding:4px 10px;border-radius:8px;font-size:10px;font-weight:600;cursor:pointer;border:1.5px solid var(--border);background:var(--card);color:var(--t2);transition:all .13s;user-select:none}
+.dur-btn:hover{border-color:var(--red);color:var(--red);background:rgba(255,45,85,.05)}
+.tier{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--border);border-radius:11px;padding:8px 11px;margin-bottom:5px}
+.tier-b{width:24px;height:24px;border-radius:6px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800}
+.t1 .tier-b{background:var(--gold);color:#1a0f00}.t2 .tier-b{background:linear-gradient(135deg,#ddd,#aaa);color:#111}.t3 .tier-b{background:linear-gradient(135deg,#cd7f32,#a0522d);color:#fff}
+.tier-inp{flex:1;background:none;border:none;outline:none;color:var(--t1);font-size:13px}
+.tier-inp::placeholder{color:var(--t3)}
+.add-tier{width:100%;padding:9px;border-radius:11px;background:none;border:1.5px dashed var(--border);color:var(--t3);cursor:pointer;font-size:12px;transition:all .14s;display:flex;align-items:center;justify-content:center;gap:5px}
+.add-tier:hover{border-color:rgba(255,45,85,.35);color:var(--red);background:rgba(255,45,85,.04)}
+.img-area{border:2px dashed var(--border);border-radius:13px;padding:18px;text-align:center;cursor:pointer;position:relative;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:5px;transition:all .18s;min-height:90px}
+.img-area:hover,.img-area.drag{border-color:var(--red);background:rgba(255,45,85,.04)}
+.img-area input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.img-bar{height:3px;background:var(--border);border-radius:3px;overflow:hidden;margin-top:7px;display:none}
+.img-bar-f{height:100%;background:var(--fire);width:0%;transition:width .3s}
+.link-box{background:rgba(48,209,88,.07);border:1.5px solid rgba(48,209,88,.18);border-radius:13px;padding:12px;margin-top:11px}
+.link-url{font-size:11px;color:var(--grn);font-family:monospace;word-break:break-all;margin-bottom:8px}
+/* ─── FORMS ─── */
+.field{margin-bottom:11px}
+.lbl{display:block;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);margin-bottom:4px}
+.inp{width:100%;background:var(--card);border:1.5px solid var(--border);border-radius:11px;padding:10px 12px;color:var(--t1);font-family:'Outfit',sans-serif;font-size:14px;outline:none;transition:border-color .18s,box-shadow .18s;-webkit-appearance:none}
+.inp:focus{border-color:var(--red);box-shadow:0 0 0 3px rgba(255,45,85,.1)}
+.inp::placeholder{color:var(--t3)}
+textarea.inp{resize:vertical;min-height:70px}
+select.inp option{background:var(--bg2)}
+/* ─── TOGGLE ─── */
+.tog-row{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--card);border:1px solid var(--border);border-radius:11px;margin-bottom:7px}
+.tog{position:relative;width:40px;height:23px;flex-shrink:0}
+.tog input{opacity:0;width:0;height:0}
+.tog-sl{position:absolute;inset:0;background:var(--border2);border-radius:11px;cursor:pointer;transition:.2s}
+.tog-sl::before{content:'';position:absolute;height:17px;width:17px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.2s;box-shadow:0 2px 4px rgba(0,0,0,.25)}
+.tog input:checked+.tog-sl{background:var(--red)}
+.tog input:checked+.tog-sl::before{transform:translateX(17px)}
+/* ─── BUTTONS ─── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:none;cursor:pointer;border-radius:12px;font-family:'Outfit',sans-serif;font-weight:600;font-size:13px;white-space:nowrap;user-select:none;transition:all .15s}
+.btn:active:not(:disabled){transform:scale(.94)!important}
+.btn:disabled{opacity:.4;cursor:not-allowed!important;transform:none!important}
+.btn-fire{background:var(--fire);color:#fff;padding:11px 18px;box-shadow:0 4px 18px rgba(255,45,85,.28)}
+.btn-fire:hover:not(:disabled){box-shadow:0 7px 26px rgba(255,45,85,.44);filter:brightness(1.06)}
+.btn-gold{background:var(--gold);color:#1a0e00;padding:10px 16px;font-weight:700;box-shadow:0 4px 14px rgba(255,214,10,.18)}
+.btn-gold:hover:not(:disabled){box-shadow:0 7px 22px rgba(255,214,10,.34)}
+.btn-ghost{background:var(--card);color:var(--t2);padding:8px 13px;border:1px solid var(--border)}
+.btn-ghost:hover:not(:disabled){background:var(--card2);color:var(--t1);border-color:var(--border2)}
+.btn-danger{background:rgba(255,45,85,.1);color:var(--red);padding:8px 13px;border:1px solid rgba(255,45,85,.2)}
+.btn-danger:hover:not(:disabled){background:rgba(255,45,85,.18)}
+.btn-sm{padding:6px 10px;font-size:11px;border-radius:9px;gap:4px}
+.btn-block{width:100%}
+.btn-icon{width:32px;height:32px;padding:0;border-radius:9px}
+/* ─── PROFILE ─── */
+.pr-hero{padding:22px 14px 18px;text-align:center;background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(255,45,85,.09) 0%,transparent 70%);border-bottom:1px solid var(--border)}
+.pr-ava{width:70px;height:70px;border-radius:20px;background:var(--fire);display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:800;margin:0 auto 10px;cursor:pointer;overflow:hidden;color:#fff}
+/* ─── MGMT ─── */
+.mgr-tabs{display:flex;gap:2px;background:var(--card);border-radius:11px;padding:3px;margin-bottom:13px}
+.mgr-tab{flex:1;padding:6px 3px;border-radius:9px;font-size:10px;font-weight:600;color:var(--t3);cursor:pointer;border:none;background:none;font-family:'Outfit',sans-serif;text-align:center;transition:all .13s}
+.mgr-tab.on{background:rgba(255,45,85,.13);color:var(--red)}
+.mgr-panel{display:none}.mgr-panel.on{display:block}
+.mgr-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-bottom:12px}
+.mgr-stat{background:var(--card);border:1px solid var(--border);border-radius:11px;padding:10px;text-align:center}
+.mgr-sn{font-family:'Unbounded',sans-serif;font-size:18px;font-weight:800;background:var(--fire);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.mgr-sl{font-size:8px;color:var(--t3);text-transform:uppercase;letter-spacing:.05em;margin-top:2px}
+.part-row{display:flex;align-items:center;gap:7px;padding:7px 10px;border-radius:9px;background:rgba(255,255,255,.02);border:1px solid var(--border);margin-bottom:4px;transition:background .12s}
+.part-row:hover{background:rgba(255,255,255,.04)}.part-row.sel{background:rgba(255,45,85,.07);border-color:rgba(255,45,85,.2)}
+.part-chk{width:13px;height:13px;cursor:pointer;accent-color:var(--red);flex-shrink:0}
+.part-info{flex:1;min-width:0}
+.part-name{font-weight:500;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.part-email{font-size:10px;color:var(--t3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.part-win-bdg{font-size:9px;padding:1px 6px;border-radius:5px;background:rgba(48,209,88,.12);color:var(--grn);border:1px solid rgba(48,209,88,.2);font-weight:600;flex-shrink:0}
+.w-card{background:linear-gradient(135deg,rgba(48,209,88,.09),rgba(50,215,75,.03));border:1px solid rgba(48,209,88,.2);border-radius:12px;padding:11px;margin-bottom:6px;animation:fu .4s cubic-bezier(.34,1.56,.64,1) both}
+.bulk-bar{display:none;align-items:center;justify-content:space-between;padding:7px 10px;background:rgba(255,45,85,.08);border:1px solid rgba(255,45,85,.2);border-radius:9px;margin-bottom:7px}
+.bulk-bar.on{display:flex}
+.speed-row{display:flex;gap:5px;justify-content:center;margin-bottom:8px}
+.speed-btn{padding:5px 12px;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;border:1.5px solid var(--border);background:var(--card);color:var(--t3);transition:all .13s;user-select:none;display:flex;align-items:center;gap:4px}
+.speed-btn.on{background:rgba(255,45,85,.13);border-color:rgba(255,45,85,.28);color:var(--red)}
+/* ─── SHEETS ─── */
+.sh-bd,.sheet-bd{position:fixed;inset:0;z-index:400;background:rgba(0,0,0,.7);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);opacity:0;pointer-events:none;transition:opacity .2s}
+.sh-bd.on,.sheet-bd.on{opacity:1;pointer-events:all}
+.sh-hdl,.sheet-handle{width:36px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 14px}
+.sh-hdr,.sheet-row{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:13px}
+.sh-t,.sheet-t{font-family:'Unbounded',sans-serif;font-size:14px;font-weight:700}
+.sh-s{font-size:11px;color:var(--t2);margin-top:3px}
+.xbtn{width:30px;height:30px;border-radius:8px;background:var(--card);border:1px solid var(--border);color:var(--t3);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .13s}
+.xbtn:hover{background:rgba(255,45,85,.1);color:var(--red);border-color:rgba(255,45,85,.25)}
+/* ─── TOASTS ─── */
+#toasts{position:fixed;bottom:calc(var(--bot) + var(--safe-bot) + 10px);right:11px;z-index:9000;display:flex;flex-direction:column-reverse;gap:5px;pointer-events:none;max-width:280px}
+.toast{background:var(--bg3);border:1px solid var(--border2);border-radius:12px;padding:9px 12px;font-size:12px;box-shadow:0 10px 34px rgba(0,0,0,.6);animation:tin .28s cubic-bezier(.34,1.56,.64,1) both;display:flex;align-items:flex-start;gap:8px;line-height:1.4;pointer-events:auto;overflow:hidden;position:relative}
+@keyframes tin{from{opacity:0;transform:translateX(14px) scale(.9)}}
+.toast.out{animation:tout .2s ease forwards}
+@keyframes tout{to{opacity:0;transform:translateX(14px) scale(.9)}}
+.toast-ok{border-left:3px solid var(--grn)}.toast-err{border-left:3px solid var(--red)}.toast-warn{border-left:3px solid var(--ora)}.toast-info{border-left:3px solid var(--blu)}
+/* ─── NC ─── */
+#nc{position:fixed;top:calc(var(--nav) + var(--safe-top));right:0;width:300px;max-height:420px;overflow-y:auto;z-index:300;background:var(--bg2);border:1px solid var(--border2);border-radius:0 0 0 18px;transform:translateX(110%);transition:transform .26s cubic-bezier(.34,1.56,.64,1);box-shadow:-6px 6px 28px rgba(0,0,0,.5)}
+#nc.on{transform:translateX(0)}
+.nc-hdr{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg2)}
+.nc-ico{width:28px;height:28px;border-radius:8px;background:var(--card);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.nc-item{display:flex;align-items:flex-start;gap:9px;padding:10px 14px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .12s}
+.nc-item:hover{background:var(--card)}.nc-item.unr{background:rgba(255,45,85,.04);border-left:2px solid var(--red)}
+.nc-txt{font-size:12px;flex:1;line-height:1.4}.nc-tm{font-size:10px;color:var(--t3);margin-top:2px}
+.nc-empty{padding:28px;text-align:center;color:var(--t3);font-size:12px}
+/* ─── PARTICIPANT ─── */
+#pgPP{padding-top:0!important;padding-bottom:0!important}
+.pp-hero{padding-top:calc(var(--nav) + var(--safe-top) + 22px);padding-bottom:20px;padding-left:14px;padding-right:14px;text-align:center;background:radial-gradient(ellipse 90% 60% at 50% 100%,rgba(255,45,85,.13) 0%,transparent 70%);border-bottom:1px solid var(--border)}
+.pp-name{font-family:'Unbounded',sans-serif;font-size:clamp(17px,5.5vw,28px);font-weight:900;letter-spacing:-.04em;line-height:1.1;margin-bottom:5px;background:var(--fire);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.pp-by{font-size:11px;color:var(--blu);cursor:pointer;margin-bottom:4px}
+.pp-desc{font-size:12px;color:var(--t2);max-width:340px;margin:0 auto;line-height:1.7}
+.pp-trust{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;max-width:320px;margin:13px auto 0}
+.pp-ti{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:12px;padding:9px 5px;text-align:center}
+.pp-tn{font-family:'Unbounded',sans-serif;font-size:16px;font-weight:800;background:var(--fire);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.pp-tl{font-size:8px;color:var(--t3);text-transform:uppercase;letter-spacing:.07em;margin-top:2px}
+.pp-body{max-width:460px;margin:0 auto;padding:14px 13px calc(24px + var(--safe-bot))}
+/* ─── SLOT ─── */
+#slotOv{position:fixed;inset:0;z-index:500;background:rgba(2,2,10,.97);backdrop-filter:blur(40px);display:flex;align-items:center;justify-content:center;padding:14px;opacity:0;pointer-events:none;transition:opacity .22s}
+#slotOv.on{opacity:1;pointer-events:all}
+.slot-box{text-align:center;background:linear-gradient(160deg,rgba(255,255,255,.07),rgba(255,255,255,.01));border:1px solid rgba(255,255,255,.1);border-radius:24px;padding:18px 14px 20px;width:100%;max-width:350px;position:relative;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.7)}
+.slot-win{height:156px;overflow:hidden;position:relative;border-radius:15px;background:rgba(0,0,0,.8);border:1px solid rgba(255,255,255,.08);margin-bottom:12px}
+.slot-win::before,.slot-win::after{content:'';position:absolute;left:0;right:0;height:50px;z-index:2;pointer-events:none}
+.slot-win::before{top:0;background:linear-gradient(to bottom,rgba(2,2,10,.98),transparent)}
+.slot-win::after{bottom:0;background:linear-gradient(to top,rgba(2,2,10,.98),transparent)}
+.slot-cur{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);height:52px;z-index:1;border-top:1.5px solid rgba(255,45,85,.65);border-bottom:1.5px solid rgba(255,45,85,.65);background:rgba(255,45,85,.06)}
+.slot-reel{display:flex;flex-direction:column;will-change:transform}
+.slot-item{height:52px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:500;padding:0 16px;color:rgba(255,255,255,.2);flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;transition:color .08s,font-size .08s}
+.slot-item.on{color:#fff;font-size:15px;font-weight:800}
+.slot-bar-wrap{height:3px;background:rgba(255,255,255,.05);border-radius:3px;margin-bottom:8px;overflow:hidden}
+.slot-bar{height:100%;background:var(--fire);width:0%}
+.slot-st{font-size:11px;color:var(--t2);min-height:14px;margin-bottom:8px;font-weight:500}
+.slot-rev{display:none;padding-top:3px}
+.slot-rev.on{display:block;animation:revIn .65s cubic-bezier(.34,1.56,.64,1) both}
+@keyframes revIn{from{opacity:0;transform:scale(.4) rotateY(-90deg)}to{opacity:1;transform:none}}
+.slot-wname{font-family:'Unbounded',sans-serif;font-size:clamp(14px,4.5vw,19px);font-weight:900;background:var(--gold);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin:5px 0 3px;line-height:1.1}
+.slot-wemail{font-size:10px;color:var(--t2);margin-bottom:8px;word-break:break-all}
+.slot-wprize{display:inline-flex;align-items:center;gap:5px;padding:4px 13px;border-radius:20px;background:linear-gradient(135deg,rgba(255,214,10,.14),rgba(255,149,0,.08));border:1px solid rgba(255,214,10,.28);font-weight:700;font-size:11px;color:var(--yel);margin-bottom:12px}
+.slot-hash{font-size:9px;color:var(--t3);margin-top:4px;font-family:monospace;opacity:.4}
+.slot-scan{position:absolute;top:0;left:0;right:0;height:2px;background:var(--fire);animation:scan 1.2s linear infinite;pointer-events:none}
+@keyframes scan{0%{transform:scaleX(0);transform-origin:left}49%{transform:scaleX(1);transform-origin:left}50%{transform:scaleX(1);transform-origin:right}100%{transform:scaleX(0);transform-origin:right}}
+.slot-ey{font-size:9px;font-weight:700;letter-spacing:.2em;color:var(--t3);margin-bottom:4px;text-transform:uppercase}
+.slot-pl{font-size:12px;font-weight:600;margin-bottom:12px;min-height:16px;background:var(--gold);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+/* ─── MISC ─── */
+.g-btn{background:#fff;color:#111;border:none;border-radius:11px;padding:11px 20px;font-size:13px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:7px;font-family:'Outfit',sans-serif;transition:all .18s;box-shadow:0 4px 18px rgba(0,0,0,.3)}
+.g-btn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 7px 24px rgba(0,0,0,.4)}
+@keyframes fu{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes pop{from{transform:scale(0) rotate(-180deg)}to{transform:scale(1) rotate(0)}}
+@media(min-width:768px){.ana-wrap,.dash,.cw{max-width:900px;margin-left:auto;margin-right:auto}.grid,.my-grid{grid-template-columns:repeat(auto-fill,minmax(280px,1fr))}.kpi4{grid-template-columns:repeat(4,1fr)}}
+@media(max-width:360px){.btab span{display:none}}
+
+
+/* ─── LIVE MODE ─── */
+#liveOv{position:fixed;inset:0;z-index:700;background:#000;display:none;flex-direction:column;align-items:center;justify-content:center}
+#liveOv.on{display:flex}
+.live-hdr{position:absolute;top:var(--safe-top,0px);left:0;right:0;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;background:linear-gradient(to bottom,rgba(0,0,0,.8),transparent)}
+.live-pill{display:inline-flex;align-items:center;gap:5px;background:rgba(255,45,85,.9);border-radius:7px;padding:4px 10px;font-size:10px;font-weight:700;color:#fff}
+.live-body{width:100%;max-width:460px;padding:13px;text-align:center}
+.live-win{height:176px;overflow:hidden;position:relative;border-radius:17px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);width:100%;margin-bottom:13px}
+.live-win::before,.live-win::after{content:'';position:absolute;left:0;right:0;height:58px;z-index:2;pointer-events:none}
+.live-win::before{top:0;background:linear-gradient(to bottom,rgba(0,0,0,.92),transparent)}
+.live-win::after{bottom:0;background:linear-gradient(to top,rgba(0,0,0,.92),transparent)}
+.live-cur{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);height:64px;z-index:1;border-top:2px solid var(--red);border-bottom:2px solid var(--red);background:rgba(255,45,85,.07)}
+.live-reel{display:flex;flex-direction:column}
+.live-item{height:64px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:rgba(255,255,255,.18);flex-shrink:0;padding:0 13px}
+.live-item.on{color:#fff;font-size:20px}
+.live-rev{display:none}.live-rev.on{display:block;animation:revIn .6s cubic-bezier(.34,1.56,.64,1) both}
+.live-wname{font-size:clamp(20px,5.5vw,38px);font-weight:900;background:var(--gold);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:-.04em;margin-bottom:5px}
+.live-prog{position:absolute;bottom:0;left:0;right:0;height:2px;background:rgba(255,255,255,.06)}
+.live-prog-bar{height:100%;background:var(--fire);width:0%}
+.live-cd-ov{position:absolute;inset:0;background:rgba(0,0,0,.9);display:none;align-items:center;justify-content:center;z-index:10}
+.live-cd-ov.on{display:flex}
+.live-cd-num{font-size:95px;font-weight:900;background:var(--fire);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:cdf .85s ease forwards}
+@keyframes cdf{0%{transform:scale(1.8);opacity:0}50%{opacity:1}100%{transform:scale(.3);opacity:0}}
+/* ─── SUPPORT ─── */
+.supp-opt{display:flex;align-items:center;gap:9px;padding:11px 13px;background:var(--card);border:1px solid var(--border);border-radius:13px;cursor:pointer;transition:all .14s;text-align:left;width:100%;font-family:'Outfit',sans-serif;margin-bottom:5px;border:none}
+.supp-opt:hover{background:var(--card2);transform:translateX(3px)}
+.supp-opt-ico{width:32px;height:32px;border-radius:9px;background:var(--card2);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.supp-opt-t{font-size:12px;font-weight:600;color:var(--t1)}.supp-opt-s{font-size:10px;color:var(--t3);margin-top:1px}
+/* ─── VERSION BADGE ─── */
+#vBadge{position:fixed;bottom:calc(var(--bot) + var(--safe-bot,0px) + 12px);left:12px;z-index:300;background:var(--fire);color:#fff;border-radius:20px;padding:6px 13px;font-size:11px;font-weight:700;cursor:pointer;box-shadow:0 4px 18px rgba(255,45,85,.4);display:none;align-items:center;gap:6px}
+/* ─── SCROLL TOP ─── */
+#topBtn{position:fixed;bottom:calc(var(--bot) + var(--safe-bot,0px) + 14px);right:12px;z-index:190;width:36px;height:36px;border-radius:50%;background:var(--card2);border:1px solid var(--border2);color:var(--t2);cursor:pointer;display:none;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(0,0,0,.4);transition:all .16s}
+#topBtn:hover{background:rgba(255,45,85,.15);color:var(--red)}
+/* ─── OFFLINE BAR ─── */
+#offbar{position:fixed;top:calc(var(--nav) + var(--safe-top,0px));left:0;right:0;z-index:190;background:rgba(255,45,85,.94);color:#fff;text-align:center;padding:8px;font-size:11px;font-weight:600;transform:translateY(-100%);transition:transform .3s;display:flex;align-items:center;justify-content:center;gap:6px}
+#offbar.on{transform:translateY(0)}
+/* ─── CONFETTI ─── */
+#cnf{position:fixed;inset:0;pointer-events:none;z-index:600}
+/* ─── AMBIENT ─── */
+#amb{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.ab{position:absolute;border-radius:50%;filter:blur(130px);pointer-events:none}
+.ab1{width:700px;height:700px;background:rgba(255,45,85,.05);top:-300px;left:-200px;animation:a1 28s ease-in-out infinite}
+.ab2{width:500px;height:500px;background:rgba(191,90,242,.04);bottom:-200px;right:-150px;animation:a2 34s ease-in-out infinite}
+@keyframes a1{0%,100%{transform:translate(0,0)}50%{transform:translate(60px,40px)}}
+@keyframes a2{0%,100%{transform:translate(0,0)}50%{transform:translate(-50px,-60px)}}
+/* ─── PP PAGE ─── */
+.pp-form{padding:16px}
+.pp-form-t{font-size:14px;font-weight:700;margin-bottom:3px;display:flex;align-items:center;gap:6px}
+.pp-form-s{font-size:11px;color:var(--t3);margin-bottom:13px}
+.pp-ok{display:none;padding:26px 16px;text-align:center;background:linear-gradient(135deg,rgba(48,209,88,.1),rgba(50,215,75,.03));border:1.5px solid rgba(48,209,88,.2);border-radius:18px}
+.pp-alr{display:none;padding:20px;text-align:center;background:rgba(255,45,85,.06);border:1.5px solid rgba(255,45,85,.18);border-radius:16px}
+.pp-ended{display:none;padding:20px;text-align:center;background:rgba(255,149,0,.06);border:1.5px solid rgba(255,149,0,.18);border-radius:16px}
+.pp-win-box{display:none;margin-top:13px}
+.pp-win-t{font-size:9px;font-weight:700;color:var(--t2);margin-bottom:8px;letter-spacing:.07em;text-transform:uppercase;display:flex;align-items:center;gap:6px}
+.win-row{display:flex;align-items:center;gap:9px;padding:9px 12px;background:rgba(255,214,10,.05);border:1px solid rgba(255,214,10,.14);border-radius:11px;margin-bottom:5px}
+.win-name{font-weight:600;font-size:12px}.win-prize{font-size:10px;color:var(--yel);margin-top:1px}
+.pp-agree{display:flex;align-items:flex-start;gap:8px;margin-bottom:12px;cursor:pointer;user-select:none}
+.pp-agree input{width:16px;height:16px;cursor:pointer;accent-color:var(--red);flex-shrink:0;margin-top:1px}
+.pp-agree-txt{font-size:11px;color:var(--t2);line-height:1.5}
+.pp-prizes{display:flex;flex-direction:column;gap:6px;margin-bottom:13px}
+.pp-prize{display:flex;align-items:center;gap:9px;padding:10px 12px;border-radius:13px;border:1px solid var(--border)}
+.pp-p1{background:linear-gradient(135deg,rgba(255,214,10,.08),rgba(255,149,0,.04));border-color:rgba(255,214,10,.18)!important}
+.pp-prog{margin-bottom:13px}
+.pp-prog-top{display:flex;justify-content:space-between;font-size:11px;color:var(--t2);margin-bottom:5px}
+.pp-prog-track{height:5px;background:rgba(255,255,255,.07);border-radius:3px;overflow:hidden}
+.pp-prog-fill{height:100%;background:var(--fire);border-radius:3px;transition:width .5s;width:0%}
+.pp-rules{background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:12px}
+.pp-rules-t{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--t3);margin-bottom:8px;display:flex;align-items:center;gap:5px}
+.pp-rules ul{list-style:none;display:flex;flex-direction:column;gap:5px}
+.pp-rules li{font-size:12px;color:var(--t2);display:flex;align-items:flex-start;gap:7px;line-height:1.5}
+.pp-social{background:rgba(191,90,242,.07);border:1px solid rgba(191,90,242,.18);border-radius:9px;padding:9px 11px;font-size:12px;color:var(--pur);margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.pp-sp{background:rgba(48,209,88,.08);border:1px solid rgba(48,209,88,.2);border-radius:9px;padding:7px 11px;font-size:11px;color:var(--grn);margin-bottom:11px;display:none;align-items:center;gap:6px;justify-content:center}
+.pp-ticker{background:rgba(10,132,255,.08);border:1px solid rgba(10,132,255,.2);border-radius:9px;padding:7px 11px;font-size:11px;color:var(--blu);margin-bottom:11px;display:none;align-items:center;gap:6px}
+.pp-cover{width:100%;max-height:220px;object-fit:cover;display:none}
+.pp-ico{font-size:54px;display:block;margin:0 auto 10px;animation:bob 3.5s ease-in-out infinite}
+.pp-ico svg[data-lucide]{width:50px!important;height:50px!important;stroke:var(--red)}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+.pp-ok-i svg[data-lucide]{width:52px!important;height:52px!important;stroke:var(--grn);display:block;margin:0 auto 10px;animation:pop .6s cubic-bezier(.34,1.56,.64,1)}
+.share-row{display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
+/* ─── PROFILE ─── */
+.pr-wrap{max-width:900px;margin:0 auto;padding:13px 12px}
+
+
+/* dash-t compatibility */
+.dash-t{font-family:"Unbounded",sans-serif;font-size:15px;font-weight:700;display:flex;align-items:center;gap:7px}
+/* srch-wrap compat */
+.srch-wrap{position:relative;margin-bottom:9px}
+.srch-ic{position:absolute;left:11px;top:50%;transform:translateY(-50%);width:14px;height:14px;color:var(--t3);pointer-events:none;display:flex;align-items:center}
+/* hero compat (eski HTML kalıntısı) */
+.hero{padding:22px 14px 14px;background:radial-gradient(ellipse 90% 60% at 50% 0%,rgba(255,45,85,.12) 0%,transparent 70%);border-bottom:1px solid var(--border)}
+.hero-hl{background:var(--fire);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:11px}
+.hs-n{font-family:"Unbounded",sans-serif;font-size:17px;font-weight:800;background:var(--fire);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hs-l{font-size:8px;color:var(--t3);text-transform:uppercase;letter-spacing:.07em;margin-top:2px;text-align:center}
+.dbody{padding:11px 13px 0}
+/* live pill */
+.live-pill{display:inline-flex;align-items:center;gap:5px;background:rgba(255,45,85,.1);border:1px solid rgba(255,45,85,.22);border-radius:20px;padding:4px 11px;font-size:10px;font-weight:700;color:var(--red);margin-bottom:9px}
 </style>
 </head>
 <body>
@@ -789,45 +1141,50 @@ svg[data-lucide]{width:1em;height:1em;stroke:currentColor;fill:none;stroke-width
 </div>
 
 <!-- SETTINGS -->
-<div class="sett-bd" id="settBd"></div>
+<div class="sh-bd" id="settBd"></div>
 
 
 <!-- DISCOVER -->
 <div id="pgD" class="pg on">
-  <div class="hero">
-    <div class="live-pill"><div class="ldot"></div>CANLI ÇEKİLİŞLER</div>
-    <h1>Kazanmaya<br>Hazır mısın? <span class="hero-hl">Keşfet</span></h1>
-    <p>Aktif çekilişleri keşfet, Gmail ile katıl, kazanırsan haber al.</p>
-    <div class="hero-stats">
-      <div><div class="hs-n" id="sA">—</div><div class="hs-l">Aktif</div></div>
-      <div><div class="hs-n" id="sK">—</div><div class="hs-l">Katılım</div></div>
-      <div><div class="hs-n" id="sW">—</div><div class="hs-l">Kazanan</div></div>
-      <div><div class="hs-n" id="sT">—</div><div class="hs-l">Toplam</div></div>
+  <div class="disc-hero">
+    <div class="disc-live"><div class="ldot"></div>CANLI ÇEKİLİŞLER</div>
+    <div class="disc-h1">Kazanmaya<br>Hazır mısın? <span class="disc-hl">Keşfet</span></div>
+    <p style="font-size:12px;color:var(--t2);margin-top:5px">Gmail ile katıl, kazanırsan bildirim al.</p>
+    <div class="disc-stats">
+      <div class="ds"><div class="ds-n" id="sA">--</div><div class="ds-l">Aktif</div></div>
+      <div class="ds"><div class="ds-n" id="sK">--</div><div class="ds-l">Katılım</div></div>
+      <div class="ds"><div class="ds-n" id="sW">--</div><div class="ds-l">Kazanan</div></div>
+      <div class="ds"><div class="ds-n" id="sT">--</div><div class="ds-l">Toplam</div></div>
     </div>
   </div>
-  <div class="dbody">
-    <div class="srch-wrap"><span class="srch-ic"><i data-lucide="search"></i></span><input class="inp srch-inp" id="discSearch" placeholder="Çekiliş ara..." autocomplete="off"><button class="srch-clr" id="discClr"><i data-lucide="x"></i></button></div>
+  <div class="disc-body">
+    <div class="disc-top-bar">
+      <div class="srch-w">
+        <i data-lucide="search" style="position:absolute;left:11px;top:50%;transform:translateY(-50%);width:14px;height:14px;color:var(--t3);pointer-events:none"></i>
+        <input class="inp srch-inp" id="discSearch" placeholder="Çekiliş, ödül veya organizatör ara..." autocomplete="off">
+        <button class="srch-clr" id="discClr"><i data-lucide="x"></i></button>
+      </div>
+      <button id="viewToggle" class="btn btn-ghost btn-icon" title="Görünüm"><i data-lucide="layout-grid" id="viewIco"></i></button>
+    </div>
     <div class="cats">
-      <div class="cat on" data-c="all">Tümü</div>
+      <div class="cat on" data-c="all"><i data-lucide="layers"></i> Tümü</div>
+      <div class="cat" data-c="fav"><i data-lucide="heart"></i> Favoriler</div>
       <div class="cat" data-c="tech"><i data-lucide="monitor"></i> Teknoloji</div>
       <div class="cat" data-c="game"><i data-lucide="gamepad-2"></i> Oyun</div>
       <div class="cat" data-c="fashion"><i data-lucide="shopping-bag"></i> Moda</div>
       <div class="cat" data-c="food"><i data-lucide="utensils"></i> Yiyecek</div>
       <div class="cat" data-c="sport"><i data-lucide="activity"></i> Spor</div>
-      <div class="cat" data-c="other"><i data-lucide="package"></i> Diğer
-    
-      <div class="cat fav-cat" data-c="fav" id="favCat"><i data-lucide="star"></i> Favoriler</div>
+      <div class="cat" data-c="other"><i data-lucide="package"></i> Diğer</div>
     </div>
     <div class="frow">
-      <span style="font-size:11px;color:var(--t3);white-space:nowrap">Sırala:</span>
-      <select class="fsel" id="discSort"><option value="new">Yeni</option><option value="popular">Popüler</option><option value="ending">Bitmesine Yakın</option></select>
+      <select class="fsel" id="discSort"><option value="new">Yeni Eklenen</option><option value="popular">En Popüler</option><option value="ending">Bitmesine Yakın</option></select>
       <select class="fsel" id="discStatus"><option value="all">Tümü</option><option value="live">Aktif</option><option value="end">Bitti</option></select>
+      <div class="disc-count"><b id="discCountN">0</b>&nbsp;sonuç</div>
     </div>
-    <div class="grid" id="discGrid"><div class="empty"><span class="spin"></span></div></div>
+    <div class="grid" id="discGrid"><div style="grid-column:1/-1;padding:28px;text-align:center"><span class="spin"></span></div></div>
+    <div style="height:14px"></div>
   </div>
 </div>
-
-<!-- DASHBOARD -->
 <div id="pgP" class="pg">
   <div class="dash">
     <div class="dash-hdr">
@@ -930,6 +1287,7 @@ svg[data-lucide]{width:1em;height:1em;stroke:currentColor;fill:none;stroke-width
 </div>
 
 <!-- PARTICIPANT -->
+
 <div id="pgPP" class="pg">
   <img id="ppCover" class="pp-cover">
   <div class="pp-hero">
@@ -1179,7 +1537,7 @@ svg[data-lucide]{width:1em;height:1em;stroke:currentColor;fill:none;stroke-width
 </div>
 
 <!-- VERSION SHEET -->
-<div class="sheet-bd" id="vBd"></div>
+<div class="sh-bd" id="vBd"></div>
 <div class="sheet" id="vSheet" style="max-width:480px">
   <div class="sheet-handle"></div>
   <div class="sheet-row">
@@ -1390,6 +1748,7 @@ window.lucide = { createIcons: function(opts) { _renderIcons(opts&&opts.nodes?op
 
 </script>
 <script type="module">
+
 // Render initial icons
 _renderIcons();
 
@@ -3398,5 +3757,212 @@ function runLiveSlot(prize,prizeIdx){
 _renderIcons();
 </script>
 <button id="topBtn" onclick="window.scrollTo({top:0,behavior:'smooth'})" style="position:fixed;bottom:max(70px,calc(var(--safe-bot)+60px));right:12px;z-index:190;width:38px;height:38px;border-radius:50%;background:var(--card2);border:1px solid var(--b2);color:var(--t2);font-size:16px;cursor:pointer;display:none;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,.4);transition:all .2s">↑</button>
+
+<!-- MANAGER SHEET -->
+<div class="sh-bd" id="mgrBd"></div>
+<div class="sheet" id="mgrSheet" style="max-height:96dvh">
+  <div class="sh-hdl"></div>
+  <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px">
+    <div><div class="sh-t" id="mgrT">Yönetim</div><div style="font-size:11px;color:var(--t2);margin-top:2px" id="mgrS"></div></div>
+    <div style="display:flex;gap:4px">
+      <button class="xbtn" id="mgrShareBtn" title="Paylaş"><i data-lucide="share-2"></i></button>
+      <button class="xbtn" id="mgrX"><i data-lucide="x"></i></button>
+    </div>
+  </div>
+  <div class="mgr-tabs">
+    <button class="mgr-tab on" data-mt="ov">Genel</button>
+    <button class="mgr-tab" data-mt="pt">Katılımcılar</button>
+    <button class="mgr-tab" data-mt="wn">Kazananlar</button>
+    <button class="mgr-tab" data-mt="st">İstatistik</button>
+  </div>
+  <div class="mgr-panel on" id="mt-ov">
+    <div class="mgr-stats">
+      <div class="mgr-stat"><div class="mgr-sn" id="mK">0</div><div class="mgr-sl">Katılımcı</div></div>
+      <div class="mgr-stat"><div class="mgr-sn" id="mW">0</div><div class="mgr-sl">Kazanan</div></div>
+      <div class="mgr-stat"><div class="mgr-sn" id="mU">0</div><div class="mgr-sl">Uygun</div></div>
+    </div>
+    <div id="mgrPR"></div>
+    <div class="field" style="margin-bottom:8px"><label class="lbl">Kazanana Not</label><input class="inp" id="orgNote" placeholder="Ödül teslimi hakkında..."></div>
+    <div class="speed-row" id="mgrSpeeds">
+      <button class="speed-btn" data-sp="7000"><i data-lucide="gauge"></i> Yavaş</button>
+      <button class="speed-btn on" data-sp="5000"><i data-lucide="zap"></i> Normal</button>
+      <button class="speed-btn" data-sp="3000"><i data-lucide="zap"></i> Hızlı</button>
+    </div>
+    <div style="display:flex;gap:5px;margin-bottom:8px">
+      <button class="btn btn-gold" style="flex:1;font-size:12px;padding:9px;gap:6px" id="drawBtn"><i data-lucide="trophy"></i> Kazanan Seç</button>
+      <button class="xbtn" id="rerollBtn" title="Geri al"><i data-lucide="rotate-ccw"></i></button>
+      <button class="xbtn" id="liveBtn" title="Canlı Yayın"><i data-lucide="radio"></i></button>
+    </div>
+    <div id="mgrWL"></div>
+    <button class="btn btn-ghost btn-sm" id="prevMailBtn" style="font-size:11px;gap:5px;margin-bottom:5px"><i data-lucide="mail"></i> Mail Önizle</button>
+    <div id="emailPrev" style="display:none;background:var(--bg3);border:1px solid var(--border2);border-radius:11px;padding:13px;font-size:11px;line-height:1.7;color:var(--t2);white-space:pre-wrap;max-height:180px;overflow-y:auto;margin-bottom:7px"></div>
+  </div>
+  <div class="mgr-panel" id="mt-pt">
+    <input class="inp" id="partSearch" placeholder="Katılımcı ara..." style="margin-bottom:6px">
+    <div style="display:flex;gap:5px;margin-bottom:6px;flex-wrap:wrap">
+      <select class="fsel" id="partFilter" style="flex:1"><option value="all">Tümü</option><option value="elig">Uygun</option><option value="win">Kazananlar</option></select>
+      <button class="btn btn-ghost btn-sm" id="selAllBtn"><i data-lucide="check-square"></i></button>
+      <button class="btn btn-ghost btn-sm" id="selNoneBtn"><i data-lucide="square"></i></button>
+    </div>
+    <div class="bulk-bar" id="bulkBar">
+      <span style="font-size:11px;color:var(--red);font-weight:600" id="bulkCnt">0 seçili</span>
+      <div style="display:flex;gap:4px">
+        <button class="btn btn-danger btn-sm" id="bulkRmBtn" style="gap:4px"><i data-lucide="user-minus"></i> Çıkar</button>
+        <button class="btn btn-ghost btn-sm" id="bulkMailBtn" style="gap:4px"><i data-lucide="mail"></i></button>
+      </div>
+    </div>
+    <div id="partsSec"></div>
+    <div style="display:flex;gap:5px;margin-top:7px">
+      <button class="btn btn-ghost btn-sm" style="flex:1;gap:4px" id="csvBtn"><i data-lucide="download"></i> CSV</button>
+      <button class="btn btn-ghost btn-sm" style="flex:1;gap:4px" id="txtBtn"><i data-lucide="file-text"></i> Özet</button>
+    </div>
+  </div>
+  <div class="mgr-panel" id="mt-wn"><div id="winnersPanel"><div class="empty"><div class="empty-i"><i data-lucide="trophy"></i></div><div class="empty-t">Kazanan seçilmedi.</div></div></div></div>
+  <div class="mgr-panel" id="mt-st"><div id="statsPanel"></div></div>
+</div>
+
+<!-- DELETE SHEET -->
+<div class="sh-bd" id="delBd"></div>
+<div class="sheet" id="delSheet">
+  <div class="sh-hdl"></div>
+  <div style="text-align:center;padding:8px 0 14px">
+    <div style="width:52px;height:52px;background:rgba(255,45,85,.12);border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 12px"><i data-lucide="trash-2" style="width:24px;height:24px;color:var(--red)"></i></div>
+    <div class="sh-t" style="margin-bottom:6px">Çekilişi Sil</div>
+    <div style="color:var(--t2);font-size:12px;margin-bottom:16px;line-height:1.6" id="delMsg"></div>
+    <div style="display:flex;gap:8px;justify-content:center">
+      <button class="btn btn-ghost" id="delNo" style="padding:9px 18px;gap:5px"><i data-lucide="x"></i> İptal</button>
+      <button class="btn btn-danger" id="delYes" style="padding:9px 18px;gap:5px"><i data-lucide="trash-2"></i> Sil</button>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT SHEET -->
+<div class="sh-bd" id="editBd"></div>
+<div class="sheet" id="editSheet">
+  <div class="sh-hdl"></div>
+  <div class="sh-hdr"><div class="sh-t">Düzenle</div><button class="xbtn" id="editX"><i data-lucide="x"></i></button></div>
+  <div class="field"><label class="lbl">Açıklama</label><input class="inp" id="eDesc"></div>
+  <div class="field"><label class="lbl">Bitiş Tarihi</label><input class="inp" type="datetime-local" id="eEnd">
+    <div class="dur-row" style="margin-top:5px">
+      <button class="dur-btn edit-dur" data-d="1">+1G</button>
+      <button class="dur-btn edit-dur" data-d="3">+3G</button>
+      <button class="dur-btn edit-dur" data-d="7">+1H</button>
+    </div>
+  </div>
+  <div class="field"><label class="lbl">Max Katılımcı</label><input class="inp" type="number" id="eMaxP" min="0" value="0" inputmode="numeric"></div>
+  <div class="field"><label class="lbl">1. Ödül</label><input class="inp" id="eP1"></div>
+  <div class="field"><label class="lbl">2. Ödül</label><input class="inp" id="eP2"></div>
+  <div class="field"><label class="lbl">3. Ödül</label><input class="inp" id="eP3"></div>
+  <div class="tog-row" style="margin-bottom:11px"><div><div style="font-size:13px;font-weight:500">Özel Çekiliş</div></div><label class="tog"><input type="checkbox" id="ePriv"><span class="tog-sl"></span></label></div>
+  <input id="eDrawId" style="display:none">
+  <button class="btn btn-fire btn-block" id="eSaveBtn" style="padding:11px;gap:7px"><i data-lucide="save"></i> Kaydet</button>
+</div>
+
+<!-- CLEAN DB SHEET -->
+<div class="sh-bd" id="cleanBd"></div>
+<div class="sheet" id="cleanSheet">
+  <div class="sh-hdl"></div>
+  <div class="sh-hdr"><div class="sh-t">DB Temizle</div><button class="xbtn" id="cleanX"><i data-lucide="x"></i></button></div>
+  <div style="background:rgba(255,149,0,.08);border:1px solid rgba(255,149,0,.2);border-radius:9px;padding:8px 11px;font-size:11px;color:var(--ora);margin-bottom:9px;display:flex;align-items:center;gap:6px"><i data-lucide="alert-triangle" style="flex-shrink:0"></i> Seçili çekilişler kalıcı silinir.</div>
+  <div id="cleanList" style="display:flex;flex-direction:column;gap:4px;margin-bottom:9px;max-height:190px;overflow-y:auto"><span class="spin"></span></div>
+  <div style="display:flex;gap:5px">
+    <button class="btn btn-danger btn-sm" id="cleanDo" style="flex:1;gap:4px"><i data-lucide="trash-2"></i> Seçilenleri Sil</button>
+    <button class="btn btn-ghost btn-sm" id="cleanNo">İptal</button>
+  </div>
+</div>
+
+<!-- SUPPORT SHEET -->
+<div class="sh-bd" id="suppBd"></div>
+<div class="sheet" id="suppSheet">
+  <div class="sh-hdl"></div>
+  <div style="font-size:14px;font-weight:700;margin-bottom:4px;display:flex;align-items:center;gap:7px"><i data-lucide="help-circle" style="color:var(--blu)"></i> Destek</div>
+  <div style="font-size:12px;color:var(--t2);margin-bottom:13px">Sorununuzu seçin.</div>
+  <div id="suppOpts"></div>
+  <button class="btn btn-ghost btn-sm btn-block" style="margin-top:4px" id="suppClose">Kapat</button>
+</div>
+
+<!-- MAINTENANCE SHEET -->
+<div class="sh-bd" id="maintBd"></div>
+<div class="sheet" id="maintSheet">
+  <div class="sh-hdl"></div>
+  <div class="sh-hdr">
+    <div><div class="sh-t">Bakım Modu</div><div class="sh-s">Admin — ziyaretçiler bakım sayfasına yönlendiriliyor</div></div>
+    <button class="xbtn" id="maintX"><i data-lucide="x"></i></button>
+  </div>
+  <div id="maintStatus" style="padding:9px 12px;border-radius:10px;font-size:12px;font-weight:600;margin-bottom:12px;text-align:center;background:var(--card);color:var(--t2);border:1px solid var(--border)">Kontrol ediliyor...</div>
+  <div class="field"><label class="lbl">Mesaj</label><input class="inp" id="maintMsgInp" value="Site şu an bakımda. Kısa süre içerisinde döneceğiz!"></div>
+  <div class="field"><label class="lbl">Tahmini Bitiş</label><input class="inp" type="datetime-local" id="maintEndInp">
+    <div class="dur-row" style="margin-top:5px">
+      <button class="dur-btn maint-dur" data-m="30">30dk</button>
+      <button class="dur-btn maint-dur" data-m="60">1sa</button>
+      <button class="dur-btn maint-dur" data-m="120">2sa</button>
+      <button class="dur-btn maint-dur" data-m="360">6sa</button>
+    </div>
+  </div>
+  <div style="display:flex;gap:6px">
+    <button class="btn btn-fire btn-block" id="maintStartBtn" style="padding:10px;gap:7px"><i data-lucide="wrench"></i> Bakımı Başlat</button>
+    <button class="btn btn-ghost" id="maintStopBtn" style="padding:10px 13px;color:var(--grn);border-color:rgba(48,209,88,.3);display:none;gap:5px"><i data-lucide="check-circle"></i> Bitir</button>
+  </div>
+</div>
+
+<!-- PROFILE EDIT SHEET -->
+<div class="sh-bd" id="prEditBd"></div>
+<div class="sheet" id="prEditSheet">
+  <div class="sh-hdl"></div>
+  <div class="sh-hdr"><div class="sh-t">Profil Düzenle</div><button class="xbtn" id="prEditX"><i data-lucide="x"></i></button></div>
+  <div class="field"><label class="lbl">Bio</label><input class="inp" id="prBioInp" placeholder="Kendinizi tanıtın..."></div>
+  <div class="field"><label class="lbl">Web Linki</label><input class="inp" id="prLinkInp" placeholder="https://" type="url"></div>
+  <button class="btn btn-fire btn-block" id="prSaveBtn" style="padding:11px;gap:7px"><i data-lucide="save"></i> Kaydet</button>
+</div>
+
+<!-- SLOT MACHINE -->
+<div id="slotOv">
+  <div class="slot-box">
+    <div class="slot-scan"></div>
+    <div class="slot-ey">KAZANAN SEÇİLİYOR</div>
+    <div class="slot-pl" id="slotPL"></div>
+    <div class="slot-win"><div class="slot-cur"></div><div class="slot-reel" id="slotReel"></div></div>
+    <div class="slot-bar-wrap"><div class="slot-bar" id="slotBar"></div></div>
+    <div class="slot-st" id="slotSt">Karıştırılıyor...</div>
+    <div class="speed-row" id="slotSpeeds">
+      <button class="speed-btn" data-sp="7000"><i data-lucide="gauge"></i> Yavaş</button>
+      <button class="speed-btn on" data-sp="5000"><i data-lucide="zap"></i> Normal</button>
+      <button class="speed-btn" data-sp="3000"><i data-lucide="zap"></i> Hızlı</button>
+    </div>
+    <div class="slot-rev" id="slotRev">
+      <div class="slot-trophy"><i data-lucide="trophy" style="width:50px;height:50px;color:var(--yel)"></i></div>
+      <div class="slot-wname" id="slotWN"></div>
+      <div class="slot-wemail" id="slotWE"></div>
+      <div class="slot-wprize" id="slotWP"><i data-lucide="gift"></i> <span></span></div>
+      <div class="slot-hash" id="slotHash"></div>
+      <button class="btn btn-gold" style="padding:9px 20px;font-size:12px;margin-top:10px;gap:6px" id="slotNext"><i data-lucide="check"></i> Devam Et</button>
+    </div>
+  </div>
+</div>
+
+<!-- LIVE MODE -->
+<div id="liveOv">
+  <div class="live-hdr">
+    <div style="display:flex;align-items:center;gap:7px">
+      <div class="live-pill"><div class="ldot"></div>CANLI</div>
+      <span style="font-size:11px;color:rgba(255,255,255,.38)" id="liveViewers">0 izleyici</span>
+    </div>
+    <button class="btn btn-ghost btn-sm" id="liveX" style="font-size:11px;gap:4px"><i data-lucide="x"></i> Kapat</button>
+  </div>
+  <div class="live-cd-ov" id="liveCdOv"><div class="live-cd-num" id="liveCdNum">3</div></div>
+  <div class="live-body">
+    <div style="font-size:clamp(13px,3.5vw,20px);font-weight:700;color:#fff;margin-bottom:4px" id="liveT"></div>
+    <div style="font-size:12px;color:rgba(255,255,255,.38);margin-bottom:12px" id="liveP"></div>
+    <div class="live-win"><div class="live-cur"></div><div class="live-reel" id="liveReel"></div></div>
+    <div id="liveRev" class="live-rev">
+      <div class="live-wname" id="liveWN"></div>
+      <div style="font-size:13px;color:rgba(255,255,255,.38);margin-bottom:14px" id="liveWP"></div>
+      <button class="btn btn-gold" style="padding:11px 26px;font-size:13px;gap:6px" id="liveNext"><i data-lucide="check"></i> Devam</button>
+    </div>
+  </div>
+  <div class="live-prog"><div class="live-prog-bar" id="livePB"></div></div>
+</div>
+
+
 </body>
 </html>
