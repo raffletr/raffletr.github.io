@@ -127,7 +127,7 @@ select.inp{cursor:pointer;background-image:none}
 .stl::after{content:'';flex:1;height:1px;background:var(--b1)}
 
 /* TOASTS */
-#toasts{position:fixed;bottom:max(16px,calc(var(--safe-bot) + 8px));right:12px;z-index:9999;display:flex;flex-direction:column-reverse;gap:5px;align-items:flex-end;pointer-events:none;max-width:280px}
+#toasts{position:fixed;bottom:calc(var(--bot) + var(--safe-bot) + 12px);right:12px;z-index:9999;display:flex;flex-direction:column-reverse;gap:5px;align-items:flex-end;pointer-events:none;max-width:280px}
 .toast{background:var(--bg3);border:1px solid var(--b2);border-radius:13px;padding:10px 14px;font-size:12px;box-shadow:0 12px 40px rgba(0,0,0,.7);animation:tin .3s cubic-bezier(.34,1.56,.64,1) both;line-height:1.4;pointer-events:auto;max-width:280px;word-break:break-word}
 @keyframes tin{from{opacity:0;transform:translateX(14px) scale(.9)}to{opacity:1;transform:none}}
 .toast.out{animation:tout .22s ease forwards}
@@ -485,7 +485,7 @@ select.inp{cursor:pointer;background-image:none}
 .b-dot{position:absolute;bottom:calc(var(--safe-bot) + 3px);width:18px;height:3px;background:var(--fire);border-radius:2px;opacity:0;transition:opacity .2s}
 .btab.on .b-dot{opacity:1}
 /* ── VERSION BADGE ── */
-#vBadge{position:fixed;bottom:calc(var(--bot) + var(--safe-bot) + 10px);left:12px;z-index:300;background:var(--fire);color:#fff;border-radius:20px;padding:5px 12px;font-size:11px;font-weight:700;cursor:pointer;box-shadow:0 4px 18px rgba(255,45,85,.4);display:none;align-items:center;gap:5px;animation:vIn .6s cubic-bezier(.34,1.56,.64,1) both}
+#vBadge{position:fixed;bottom:calc(var(--bot) + var(--safe-bot) + 12px);left:12px;z-index:300;background:var(--fire);color:#fff;border-radius:20px;padding:5px 12px;font-size:11px;font-weight:700;cursor:pointer;box-shadow:0 4px 18px rgba(255,45,85,.4);display:none;align-items:center;gap:5px;animation:vIn .6s cubic-bezier(.34,1.56,.64,1) both}
 @keyframes vIn{from{opacity:0;transform:translateY(16px) scale(.8)}to{opacity:1;transform:none}}
 /* ── BOTTOM SHEETS (replaces overlay modals) ── */
 .sheet-bd{position:fixed;inset:0;z-index:400;background:rgba(0,0,0,.72);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);opacity:0;pointer-events:none;transition:opacity .22s}
@@ -513,7 +513,7 @@ select.inp{cursor:pointer;background-image:none}
 .ana-thumb{width:40px;height:40px;border-radius:9px;object-fit:cover;background:var(--bg3);flex-shrink:0;overflow:hidden}
 .ana-thumb img{width:100%;height:100%;object-fit:cover}
 /* SCROLL TO TOP */
-#topBtn{position:fixed;bottom:calc(var(--bot) + var(--safe-bot) + 12px);right:12px;z-index:190;width:34px;height:34px;border-radius:50%;background:var(--card2);border:1px solid var(--b2);color:var(--t2);cursor:pointer;display:none;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,.4);font-size:14px;transition:all .18s}
+#topBtn{position:fixed;bottom:calc(var(--bot) + var(--safe-bot) + 14px);right:12px;z-index:190;width:34px;height:34px;border-radius:50%;background:var(--card2);border:1px solid var(--b2);color:var(--t2);cursor:pointer;display:none;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,.4);font-size:14px;transition:all .18s}
 #topBtn:hover{background:rgba(255,45,85,.15);color:var(--red)}
 /* TOASTS - above bottom nav */
 #toasts{bottom:calc(var(--bot) + var(--safe-bot) + 8px)!important}
@@ -830,7 +830,7 @@ select.inp option{background:var(--bg2)}
 .xbtn{width:30px;height:30px;border-radius:8px;background:var(--card);border:1px solid var(--border);color:var(--t3);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .13s}
 .xbtn:hover{background:rgba(255,45,85,.1);color:var(--red);border-color:rgba(255,45,85,.25)}
 /* ─── TOASTS ─── */
-#toasts{position:fixed;bottom:calc(var(--bot) + var(--safe-bot) + 10px);right:11px;z-index:9000;display:flex;flex-direction:column-reverse;gap:5px;pointer-events:none;max-width:280px}
+#toasts{position:fixed;bottom:calc(var(--bot) + var(--safe-bot) + 12px);right:11px;z-index:9000;display:flex;flex-direction:column-reverse;gap:5px;pointer-events:none;max-width:280px}
 .toast{background:var(--bg3);border:1px solid var(--border2);border-radius:12px;padding:9px 12px;font-size:12px;box-shadow:0 10px 34px rgba(0,0,0,.6);animation:tin .28s cubic-bezier(.34,1.56,.64,1) both;display:flex;align-items:flex-start;gap:8px;line-height:1.4;pointer-events:auto;overflow:hidden;position:relative}
 @keyframes tin{from{opacity:0;transform:translateX(14px) scale(.9)}}
 .toast.out{animation:tout .2s ease forwards}
@@ -919,9 +919,9 @@ select.inp option{background:var(--bg2)}
 .supp-opt-ico{width:32px;height:32px;border-radius:9px;background:var(--card2);display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .supp-opt-t{font-size:12px;font-weight:600;color:var(--t1)}.supp-opt-s{font-size:10px;color:var(--t3);margin-top:1px}
 /* ─── VERSION BADGE ─── */
-#vBadge{position:fixed;bottom:calc(var(--bot) + var(--safe-bot,0px) + 12px);left:12px;z-index:300;background:var(--fire);color:#fff;border-radius:20px;padding:6px 13px;font-size:11px;font-weight:700;cursor:pointer;box-shadow:0 4px 18px rgba(255,45,85,.4);display:none;align-items:center;gap:6px}
+#vBadge{position:fixed;bottom:calc(var(--bot) + var(--safe-bot) + 12px);left:12px;z-index:300;background:var(--fire);color:#fff;border-radius:20px;padding:6px 13px;font-size:11px;font-weight:700;cursor:pointer;box-shadow:0 4px 18px rgba(255,45,85,.4);display:none;align-items:center;gap:6px}
 /* ─── SCROLL TOP ─── */
-#topBtn{position:fixed;bottom:calc(var(--bot) + var(--safe-bot,0px) + 14px);right:12px;z-index:190;width:36px;height:36px;border-radius:50%;background:var(--card2);border:1px solid var(--border2);color:var(--t2);cursor:pointer;display:none;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(0,0,0,.4);transition:all .16s}
+#topBtn{position:fixed;bottom:calc(var(--bot) + var(--safe-bot) + 14px);right:12px;z-index:190;width:36px;height:36px;border-radius:50%;background:var(--card2);border:1px solid var(--border2);color:var(--t2);cursor:pointer;display:none;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(0,0,0,.4);transition:all .16s}
 #topBtn:hover{background:rgba(255,45,85,.15);color:var(--red)}
 /* ─── OFFLINE BAR ─── */
 #offbar{position:fixed;top:calc(var(--nav) + var(--safe-top,0px));left:0;right:0;z-index:190;background:rgba(255,45,85,.94);color:#fff;text-align:center;padding:8px;font-size:11px;font-weight:600;transform:translateY(-100%);transition:transform .3s;display:flex;align-items:center;justify-content:center;gap:6px}
@@ -987,6 +987,10 @@ select.inp option{background:var(--bg2)}
 .dbody{padding:11px 13px 0}
 /* live pill */
 .live-pill{display:inline-flex;align-items:center;gap:5px;background:rgba(255,45,85,.1);border:1px solid rgba(255,45,85,.22);border-radius:20px;padding:4px 11px;font-size:10px;font-weight:700;color:var(--red);margin-bottom:9px}
+
+/* Sheet backdrops */
+.sh-bd{position:fixed;inset:0;z-index:400;background:rgba(0,0,0,.72);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);opacity:0;pointer-events:none;transition:opacity .22s}
+.sh-bd.on{opacity:1;pointer-events:all}
 </style>
 </head>
 <body>
@@ -1168,7 +1172,7 @@ select.inp option{background:var(--bg2)}
     </div>
     <div class="cats">
       <div class="cat on" data-c="all"><i data-lucide="layers"></i> Tümü</div>
-      <div class="cat" data-c="fav"><i data-lucide="heart"></i> Favoriler</div>
+      <div class="cat" id="favCat" data-c="fav"><i data-lucide="heart"></i> Favoriler</div>
       <div class="cat" data-c="tech"><i data-lucide="monitor"></i> Teknoloji</div>
       <div class="cat" data-c="game"><i data-lucide="gamepad-2"></i> Oyun</div>
       <div class="cat" data-c="fashion"><i data-lucide="shopping-bag"></i> Moda</div>
@@ -1869,7 +1873,7 @@ let themeLight=localStorage.getItem("r_theme")==="light";
 function applyTheme(){
   if(themeLight)document.body.setAttribute("data-lt","");
   else document.body.removeAttribute("data-lt");
-  const tb=document.getElementById("themeBtn");if(tb)tb.textContent=themeLight?"️":"";
+  const tb=document.getElementById("themeToggleBtn");if(tb)tb.textContent=themeLight?"️":"";
   const dt=document.getElementById("darkTog");if(dt)dt.checked=!themeLight;
 }
 applyTheme();
@@ -1877,7 +1881,7 @@ const savedFont=localStorage.getItem("r_font")||"14";
 document.documentElement.style.fontSize=savedFont+"px";
 const fr=document.getElementById("fontRange");if(fr){fr.value=savedFont;const fl=document.getElementById("fontLbl");if(fl)fl.textContent=savedFont+"px";}
 fr?.addEventListener("input",e=>{document.documentElement.style.fontSize=e.target.value+"px";const fl=document.getElementById("fontLbl");if(fl)fl.textContent=e.target.value+"px";localStorage.setItem("r_font",e.target.value);});
-document.getElementById("themeBtn")?.addEventListener("click",()=>{themeLight=!themeLight;localStorage.setItem("r_theme",themeLight?"light":"dark");applyTheme();});
+document.getElementById("themeToggleBtn")?.addEventListener("click",()=>{themeLight=!themeLight;localStorage.setItem("r_theme",themeLight?"light":"dark");applyTheme();});
 document.getElementById("darkTog")?.addEventListener("change",e=>{themeLight=!e.target.checked;localStorage.setItem("r_theme",themeLight?"light":"dark");applyTheme();});
 document.getElementById("pushTog")?.addEventListener("change",async e=>{if(e.target.checked){const p=await Notification.requestPermission();e.target.checked=p==="granted";}});
 document.getElementById("settBtn")?.addEventListener("click",()=>{
@@ -2659,6 +2663,8 @@ function renderDiscover(){
       // Fallback for mobile
       const ta=document.createElement("textarea");ta.value=url;ta.style.position="fixed";ta.style.opacity="0";document.body.appendChild(ta);ta.focus();ta.select();try{document.execCommand("copy");toast("Link kopyalandı!","ok");}catch(err){}document.body.removeChild(ta);
     });
+  if(window._renderIcons)_renderIcons(g);
+
   }));
 }
 
@@ -2720,6 +2726,8 @@ async function loadProfile(uid){
     });
     g.querySelectorAll(".jbtn").forEach(e=>e.addEventListener("click",()=>window.open(location.origin+location.pathname+"?g="+e.dataset.id,"_blank")));
     g.querySelectorAll(".cpl").forEach(e=>e.addEventListener("click",ev=>{ev.stopPropagation();navigator.clipboard.writeText(location.origin+location.pathname+"?g="+e.dataset.id).then(()=>toast("Kopyalandı!","ok"));}));
+  if(window._renderIcons)_renderIcons(document.getElementById("pgPR"));
+
   }catch(e){dbgErr("loadProfile draws",e);g.innerHTML='<div class="empty"><div class="empty-t" style="color:var(--red)">'+e.message+'</div></div>';}
 }
 // Profile share button
@@ -2775,6 +2783,8 @@ async function loadDash(){
     g.querySelectorAll(".ed-btn").forEach(b=>b.addEventListener("click",()=>openEdit(b.dataset.id)));
     g.querySelectorAll(".dup-btn").forEach(b=>b.addEventListener("click",()=>duplicateDraw(b.dataset.id)));
     g.querySelectorAll(".dl-btn").forEach(b=>b.addEventListener("click",()=>{delId=b.dataset.id;const dm=document.getElementById("delMsg");if(dm)dm.textContent='"'+(b.dataset.n||"").replace(/_/g," ")+'" ve tüm katılımcılar silinecek!';openSheet("delSheet","delBd");}));
+  if(window._renderIcons)_renderIcons(document.getElementById("myGrid"));
+
   }catch(e){toast("Hata: "+e.message,"err");dbgErr("loadDash",e);}
 }
 document.getElementById("refBtn")?.addEventListener("click",loadDash);
@@ -2797,78 +2807,7 @@ async function openEdit(drawId){
 
 // Clean DB
 // ── MAINTENANCE ADMIN JS ──
-document.getElementById("maintBtn")?.addEventListener("click",async()=>{
-  if(!ME||ME.email!==ADMIN){toast("Yetkisiz!","err");return;}
-  const statusEl=document.getElementById("maintStatus");
-  const startBtn=document.getElementById("maintStartBtn");
-  const stopBtn=document.getElementById("maintStopBtn");
-  if(statusEl){statusEl.textContent="Kontrol ediliyor...";statusEl.style.cssText="padding:10px 14px;border-radius:12px;font-size:12px;font-weight:600;margin-bottom:14px;text-align:center;background:rgba(255,255,255,.04);color:var(--t2)";}
-  document.openSheet("maintSheet","maintBd");
-  try{
-    const snap=await getDoc(doc(db,"config","maintenance"));
-    const active=snap.exists()&&snap.data().active===true;
-    if(statusEl){
-      statusEl.textContent=active?" Bakım Modu AKTİF":" Site Normal Çalışıyor";
-      statusEl.style.background=active?"rgba(255,45,85,.12)":"rgba(48,209,88,.1)";
-      statusEl.style.border="1px solid "+(active?"rgba(255,45,85,.3)":"rgba(48,209,88,.25)");
-      statusEl.style.color=active?"var(--red)":"var(--grn)";
-    }
-    if(startBtn)startBtn.style.display=active?"none":"flex";
-    if(stopBtn)stopBtn.style.display=active?"block":"none";
-    if(active&&snap.exists()){
-      const d=snap.data();
-      const mi=document.getElementById("maintMsgInp");if(mi&&d.message)mi.value=d.message;
-      if(d.endsAt){const ei=document.getElementById("maintEndInp");if(ei){const dt=new Date(d.endsAt);ei.value=new Date(dt.getTime()-dt.getTimezoneOffset()*60000).toISOString().slice(0,16);}}
-    }
-  }catch(e){
-    if(statusEl){statusEl.textContent=" Hata: "+e.message;statusEl.style.color="var(--red)";}
-    toast("Hata: "+e.message,"err");
-  }
-});
-
-document.getElementById("maintModalX")?.addEventListener("click",()=>document.closeSheet("maintSheet","maintBd"));
-
-document.getElementById("maintStartBtn")?.addEventListener("click",async()=>{
-  if(!ME||ME.email!==ADMIN)return;
-  const btn=document.getElementById("maintStartBtn");
-  btn.disabled=true;btn.innerHTML='<span class="spin"></span> Başlatılıyor...';
-  const msg=document.getElementById("maintMsgInp")?.value.trim()||"Site şu an bakımda. Kısa süre içinde döneceğiz! ";
-  const endVal=document.getElementById("maintEndInp")?.value;
-  let endsAt="";
-  if(endVal){try{const dt=new Date(endVal);if(!isNaN(dt.getTime()))endsAt=dt.toISOString();}catch(e){}}
-  try{
-    await setDoc(doc(db,"config","maintenance"),{
-      active:true,message:msg,endsAt,
-      startedAt:new Date().toISOString(),startedBy:ME.email
-    });
-    toast(" Bakım modu başlatıldı!","warn");
-    document.closeSheet("maintSheet","maintBd");
-    addNotif("","Bakım modu başlatıldı — ziyaretçiler bakım sayfasına yönlendiriliyor");
-  }catch(e){
-    toast("Hata: "+e.message,"err");
-    dbgErr("maintStart:",e);
-  }finally{btn.disabled=false;btn.innerHTML=" Bakımı Başlat";}
-});
-
-document.getElementById("maintStopBtn")?.addEventListener("click",async()=>{
-  if(!ME||ME.email!==ADMIN)return;
-  const btn=document.getElementById("maintStopBtn");btn.disabled=true;
-  try{
-    await setDoc(doc(db,"config","maintenance"),{active:false,message:"",endsAt:"",endedAt:new Date().toISOString()});
-    toast(" Bakım modu kapatıldı!","ok");
-    document.closeSheet("maintSheet","maintBd");
-    addNotif("","Site normale döndü");
-  }catch(e){toast("Hata: "+e.message,"err");}
-  finally{btn.disabled=false;}
-});
-
-// Duration quick buttons for maintenance
-document.querySelectorAll(".maint-dur").forEach(b=>b.addEventListener("click",()=>{
-  const d=new Date(Date.now()+parseInt(b.dataset.m)*60000);
-  const el=document.getElementById("maintEndInp");
-  if(el)el.value=new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,16);
-}));
-
+// maintBtn listener aşağıda
 document.getElementById("cleanBtn")?.addEventListener("click",async()=>{
   openSheet("cleanSheet","cleanBd");const list=document.getElementById("cleanList");if(!list)return;list.innerHTML='<span class="spin"></span>';
   try{const snap=await getDocs(collection(db,"giveaways"));const draws=[];snap.forEach(d=>draws.push({id:d.id,...d.data()}));if(!draws.length){list.innerHTML='<div style="font-size:12px;color:var(--t3);text-align:center;padding:10px">Veri yok.</div>';return;}list.innerHTML="";draws.forEach(dw=>{const div=document.createElement("div");div.style.cssText="display:flex;align-items:center;justify-content:space-between;background:var(--c1);border:1px solid var(--b1);border-radius:10px;padding:8px 13px;";div.innerHTML='<div><div style="font-size:12px;font-weight:600">'+(dw.drawNameDisplay||dw.drawName||dw.id).replace(/_/g," ")+'</div><div style="font-size:10px;color:var(--t3)">'+(dw.creatorName||"?").replace(/_/g," ")+" · "+(dw.partCount||0)+' kişi</div></div><input type="checkbox" class="ck" data-id="'+dw.id+'" style="width:16px;height:16px;cursor:pointer;accent-color:var(--red)">';list.appendChild(div);});}catch(e){list.innerHTML='<div style="color:var(--red);font-size:11px">Hata: '+e.message+'</div>';}
@@ -2928,7 +2867,7 @@ document.getElementById("pubBtn")?.addEventListener("click",async()=>{
     const link=location.origin+location.pathname+"?g="+drawId;
     const lu=document.getElementById("linkUrl");if(lu)lu.textContent=link;
     document.getElementById("linkBox").style.display="block";
-    makeQR(document.getElementById("qrCnv"),link,130);
+    makeQRImg(document.getElementById("qrImg"),link,130);
     document.getElementById("copyBtn").onclick=()=>{navigator.clipboard.writeText(link);toast("Kopyalandı!","ok");};
     document.getElementById("waBtn").onclick=()=>window.open("https://wa.me/?text="+encodeURIComponent("Çekilişe katıl: "+link),"_blank");
     document.getElementById("tgBtn").onclick=()=>window.open("https://t.me/share/url?url="+encodeURIComponent(link),"_blank");
@@ -3063,7 +3002,7 @@ function addToSearchHistory(q) {
 }
 
 function showSearchSuggestions(q) {
-  let existing = document.getElementById("searchSug");
+  let existing = document.getElementById("srchSug");
   if(!q) { if(existing) existing.remove(); return; }
   const matches = q.length >= 1
     ? [...searchHistory.filter(h => h.toLowerCase().includes(q.toLowerCase())).slice(0,4),
@@ -3090,7 +3029,7 @@ function showSearchSuggestions(q) {
   });
 }
 document.addEventListener("click", e => {
-  const sug = document.getElementById("searchSug");
+  const sug = document.getElementById("srchSug");
   if(sug && !sug.contains(e.target) && !document.getElementById("discSearch")?.contains(e.target)) sug.remove();
 });
 
@@ -3163,6 +3102,8 @@ async function loadAnalytics(){
       frag.appendChild(el);
     });
     list.appendChild(frag);
+  if(window._renderIcons)_renderIcons(document.getElementById("anaList"));
+
   }catch(e){toast("Hata: "+e.message,"err");dbgErr("loadAnalytics:",e);}
 }
 
@@ -3294,6 +3235,8 @@ async function initPP(){
   if(dw.endTime&&new Date(dw.endTime)<new Date()){ppShow("ended");return;}
   if(localStorage.getItem(lsKey)){ppShow("already");wireCancel(drawId,lsKey);ppWireSupport(drawId,dw);return;}
   ppShow("form");wireJoin(drawId,lsKey,dw);wireCancel(drawId,lsKey);ppWireSupport(drawId,dw);
+  if(window._renderIcons)_renderIcons(document.getElementById("pgPP"));
+
   document.getElementById("ppResetBtn")?.addEventListener("click",()=>{["ppNameInp","ppEmailInp","ppInstaInp"].forEach(id=>{const e=document.getElementById(id);if(e)e.value="";});document.getElementById("ppNameInp")?.focus();});
 }
 
@@ -3464,6 +3407,8 @@ async function openMgr(drawId,drawName,prizes){
     snap.forEach(d=>{const dt={id:d.id,...d.data()};allPts.push(dt);if(dt.isWinner)wins++;else mgrParts.push(dt);});
     document.getElementById("mK").textContent=snap.size;document.getElementById("mW").textContent=wins;document.getElementById("mU").textContent=snap.size-wins;
     renderParts();renderWinners();renderStats();
+  if(window._renderIcons)_renderIcons(document.getElementById("mgrSheet"));
+
   });
 }
 function renderParts(filter="all",search=""){
@@ -3753,6 +3698,271 @@ function runLiveSlot(prize,prizeIdx){
   requestAnimationFrame(liveFrame);
 }
 
+// ══ EKSİK LİSTENER'LAR ══
+
+// maintSheet listeners
+document.getElementById("maintX")?.addEventListener("click", () => closeSheet("maintSheet","maintBd"));
+document.getElementById("maintBd")?.addEventListener("click", () => closeSheet("maintSheet","maintBd"));
+document.getElementById("maintBtn")?.addEventListener("click", async () => {
+  if(!ME || ME.email !== ADMIN){ toast("Yetkisiz!","err"); return; }
+  openSheet("maintSheet","maintBd");
+  const statusEl = document.getElementById("maintStatus");
+  const startBtn = document.getElementById("maintStartBtn");
+  const stopBtn = document.getElementById("maintStopBtn");
+  if(!statusEl) return;
+  try {
+    const snap = await getDoc(doc(db,"config","maintenance"));
+    if(snap.exists() && snap.data().active){
+      statusEl.textContent = "Bakım AKTİF";
+      statusEl.style.color = "var(--red)";
+      if(startBtn) startBtn.style.display = "none";
+      if(stopBtn) stopBtn.style.display = "flex";
+    } else {
+      statusEl.textContent = "Bakım kapalı";
+      statusEl.style.color = "var(--grn)";
+      if(startBtn) startBtn.style.display = "flex";
+      if(stopBtn) stopBtn.style.display = "none";
+    }
+  } catch(e){ statusEl.textContent = "Kontrol edilemedi"; }
+});
+document.getElementById("maintStartBtn")?.addEventListener("click", async () => {
+  const msg = document.getElementById("maintMsgInp")?.value || "Bakımda";
+  const endTime = document.getElementById("maintEndInp")?.value || "";
+  try {
+    await setDoc(doc(db,"config","maintenance"), {active:true, message:msg, endTime, startedAt:serverTimestamp()});
+    toast("Bakım başlatıldı!","ok");
+    closeSheet("maintSheet","maintBd");
+    addNotif("wrench","Bakım modu aktif edildi");
+  } catch(e){ toast("Hata: "+e.message,"err"); }
+});
+document.getElementById("maintStopBtn")?.addEventListener("click", async () => {
+  try {
+    await setDoc(doc(db,"config","maintenance"), {active:false});
+    toast("Bakım kapatıldı!","ok");
+    closeSheet("maintSheet","maintBd");
+  } catch(e){ toast("Hata: "+e.message,"err"); }
+});
+document.querySelectorAll(".maint-dur").forEach(b => b.addEventListener("click", () => {
+  const el = document.getElementById("maintEndInp"); if(!el) return;
+  const d = new Date(Date.now() + parseInt(b.dataset.m)*60000);
+  el.value = new Date(d.getTime() - d.getTimezoneOffset()*60000).toISOString().slice(0,16);
+}));
+
+// editBd click listener
+document.getElementById("editBd")?.addEventListener("click", () => closeSheet("editSheet","editBd"));
+
+// delBd click listener  
+document.getElementById("delBd")?.addEventListener("click", () => closeSheet("delSheet","delBd"));
+
+// cleanBd click listener
+document.getElementById("cleanBd")?.addEventListener("click", () => closeSheet("cleanSheet","cleanBd"));
+
+// prEditBd click listener
+document.getElementById("prEditBd")?.addEventListener("click", () => closeSheet("prEditSheet","prEditBd"));
+
+// slotSpeeds event delegation (slot hız butonları)
+document.getElementById("slotSpeeds")?.addEventListener("click", e => {
+  const btn = e.target.closest(".speed-btn[data-sp]");
+  if(!btn) return;
+  document.querySelectorAll("#slotSpeeds .speed-btn").forEach(b => b.classList.remove("on"));
+  btn.classList.add("on");
+  window._slotSpeed = parseInt(btn.dataset.sp);
+});
+document.getElementById("mgrSpeeds")?.addEventListener("click", e => {
+  const btn = e.target.closest(".speed-btn[data-sp]");
+  if(!btn) return;
+  document.querySelectorAll("#mgrSpeeds .speed-btn").forEach(b => b.classList.remove("on"));
+  btn.classList.add("on");
+  window._slotSpeed = parseInt(btn.dataset.sp);
+});
+
+// edit-dur butonlar
+document.querySelectorAll(".edit-dur").forEach(b => b.addEventListener("click", () => {
+  const el = document.getElementById("eEnd"); if(!el) return;
+  const base = el.value ? new Date(el.value) : new Date();
+  const d = new Date(base.getTime() + parseInt(b.dataset.d)*86400000);
+  el.value = new Date(d.getTime() - d.getTimezoneOffset()*60000).toISOString().slice(0,16);
+}));
+
+
+// ═══════════════════════════════════════════
+// ADMİN TEST SİSTEMİ
+// ═══════════════════════════════════════════
+function _adminTest(){
+  const el = document.getElementById("adminTestResults");
+  if(!el) return;
+  let log = "";
+  let pass=0, fail=0;
+
+  function check(name, condition, detail=""){
+    const ok = typeof condition === "function" ? (() => { try { return !!condition(); } catch(e){ return false; }})() : !!condition;
+    const icon = ok ? "✅" : "❌";
+    log += icon + " " + name + (detail&&!ok?" ("+detail+")":"") + "\n";
+    if(ok) pass++; else fail++;
+    return ok;
+  }
+
+  log += "=== HTML ELEMENTLER ===\n";
+  const ids = ["pgD","pgA","pgC","pgP","pgPP","pgPR","topNav","botNav",
+    "discGrid","discSearch","vSheet","vBd","settSheet","settBd",
+    "mgrSheet","mgrBd","editSheet","editBd","delSheet","delBd",
+    "cleanSheet","cleanBd","suppSheet","suppBd","maintSheet","maintBd",
+    "prEditSheet","prEditBd","slotOv","liveOv",
+    "sA","sK","sW","sT","anaD","anaK","anaW","anaE",
+    "dName","myGrid","drawBtn","slotReel","vBadge","toasts","cnf",
+    "ppJoinBtn","ppNameInp","ppEmailInp","ppOk","ppAlr","ppEnded",
+    "qrImg","discCountN","favCat","themeToggleBtn"];
+  ids.forEach(id => check("#"+id, document.getElementById(id)));
+
+  log += "\n=== CSS DEĞİŞKENLER ===\n";
+  const style = getComputedStyle(document.documentElement);
+  ["--bg","--bg2","--bg3","--b1","--b2","--c0","--c1","--t1","--t2","--t3","--red","--grn","--fire","--nav","--bot"].forEach(v => {
+    check(v, style.getPropertyValue(v).trim() !== "");
+  });
+
+  log += "\n=== JS FONKSİYONLAR ===\n";
+  const fns = ["go","toast","openSheet","closeSheet","animCount",
+    "renderDiscover","initDiscover","loadDash","loadAnalytics",
+    "openMgr","closeMgr","runSlot","wireJoin","wireCancel",
+    "loadProfile","showVersionNote","_renderIcons","duplicateDraw",
+    "openEdit","safeImg","escHtml","makeQRImg","isFav","toggleFav",
+    "addNotif","renderNC","boom","addSearchHist"];
+  fns.forEach(fn => check(fn+"()", typeof window[fn]==="function"));
+
+  log += "\n=== SHEET CSS ===\n";
+  const sheet = document.querySelector(".sheet");
+  if(sheet){
+    const cs = getComputedStyle(sheet);
+    check(".sheet position:fixed", cs.position==="fixed");
+    check(".sheet transform kapalı", cs.transform.includes("matrix") || cs.transform.includes("translateY(100"));
+  }
+  const shBd = document.querySelector(".sh-bd");
+  if(shBd){
+    const cs = getComputedStyle(shBd);
+    check(".sh-bd position:fixed", cs.position==="fixed");
+    check(".sh-bd opacity:0 kapalı", parseFloat(cs.opacity)<0.1);
+  }
+
+  log += "\n=== SHEET OPEN/CLOSE ===\n";
+  // vSheet aç/kapat testi
+  try {
+    openSheet("vSheet","vBd");
+    const vs = document.getElementById("vSheet");
+    const isOpen = vs && vs.classList.contains("on");
+    check("vSheet açılıyor", isOpen);
+    closeSheet("vSheet","vBd");
+    const isClosed = vs && !vs.classList.contains("on");
+    check("vSheet kapanıyor", isClosed);
+  } catch(e){ check("vSheet aç/kapat", false, e.message); }
+
+  try {
+    openSheet("settSheet","settBd");
+    const ss = document.getElementById("settSheet");
+    check("settSheet açılıyor", ss && ss.classList.contains("on"));
+    closeSheet("settSheet","settBd");
+    check("settSheet kapanıyor", ss && !ss.classList.contains("on"));
+  } catch(e){ check("settSheet aç/kapat", false, e.message); }
+
+  log += "\n=== .pg GÖRÜNÜRLÜK ===\n";
+  const pgs = document.querySelectorAll(".pg");
+  const visiblePgs = [...pgs].filter(p => p.classList.contains("on"));
+  check(".pg sayısı doğru", pgs.length >= 6, pgs.length+" pg");
+  check("Sadece 1 pg görünür", visiblePgs.length === 1, visiblePgs.length+" görünür");
+
+  log += "\n=== SAYFA GEÇİŞLERİ ===\n";
+  ["pgD","pgA","pgC","pgP"].forEach(id => {
+    try {
+      go(id);
+      const el = document.getElementById(id);
+      check("go('"+id+"')", el && el.classList.contains("on"));
+    } catch(e){ check("go('"+id+"')", false, e.message); }
+  });
+  go("pgD"); // Geri dön
+
+  log += "\n=== VERİ DEĞİŞKENLER ===\n";
+  check("allDraws array", Array.isArray(window.allDraws !== undefined ? allDraws : null));
+  check("ME null/object", true); // Her zaman OK
+  check("ADMIN tanımlı", typeof ADMIN === "string" && ADMIN.includes("@"));
+  check("CUR_VER tanımlı", typeof CUR_VER === "string" && CUR_VER.length > 0);
+  check("VERSIONS tanımlı", typeof VERSIONS === "object");
+  check("CAT_IMGS tanımlı", typeof CAT_IMGS === "object");
+  check("_ICONS tanımlı", typeof window._ICONS === "object" && Object.keys(window._ICONS).length > 20);
+
+  log += "\n=== LUCIDE İKONLAR ===\n";
+  const testIcons = ["compass","settings","bell","trophy","gift","x","check","search"];
+  testIcons.forEach(ico => {
+    check("icon:"+ico, window._ICONS && window._ICONS[ico]);
+  });
+  // DOM'daki data-lucide'lar SVG'ye dönüşmüş mü?
+  const dataLucides = document.querySelectorAll("[data-lucide]");
+  const svgRendered = document.querySelectorAll("svg[data-lucide]");
+  check("SVG ikonlar render edildi", svgRendered.length > 10, svgRendered.length+"/"+dataLucides.length);
+
+  log += "\n=== SONUÇ ===\n";
+  log += "✅ Geçen: " + pass + "\n";
+  log += "❌ Başarısız: " + fail + "\n";
+  log += "Toplam: " + (pass+fail) + "\n";
+
+  el.textContent = log;
+  el.style.color = fail > 0 ? "var(--ora)" : "var(--grn)";
+  toast(fail+" hata, "+pass+" başarılı", fail>0?"warn":"ok");
+}
+
+// Admin test butonu
+(function(){
+  if(!document.getElementById("adminTestPanel")) return;
+  document.getElementById("runAllTests")?.addEventListener("click", _adminTest);
+  document.getElementById("clearTestLog")?.addEventListener("click", () => {
+    const el = document.getElementById("adminTestResults");
+    if(el) el.textContent = "Test başlatılmadı...";
+  });
+  document.getElementById("adminTestBd")?.addEventListener("click", () => closeSheet("adminTestPanel","adminTestBd"));
+})();
+
+// Admin ayarlar'da test butonu göster
+const _origAuth = window._authDone;
+function _showAdminTestBtn(){
+  if(!isAdmin) return;
+  const sett = document.getElementById("settSheet");
+  if(!sett || document.getElementById("adminTestBtn")) return;
+  const btn = document.createElement("button");
+  btn.id = "adminTestBtn";
+  btn.className = "btn btn-ghost btn-block";
+  btn.style.cssText = "margin-top:7px;padding:10px;color:var(--pur);border-color:rgba(191,90,242,.3);gap:7px";
+  btn.innerHTML = "<i data-lucide=\"flask-conical\"></i> Site Test Paneli";
+  btn.onclick = () => { closeSheet("settSheet","settBd"); setTimeout(()=>openSheet("adminTestPanel","adminTestBd"),200); };
+  sett.appendChild(btn);
+  if(window._renderIcons) _renderIcons(btn);
+}
+
+// Auth değiştiğinde test butonunu göster
+const _origOnAuth = typeof onAuthStateChanged !== "undefined" ? null : null;
+// Auth bloğunda ME set edildikten sonra çağır
+setTimeout(_showAdminTestBtn, 2000);
+
+// Expose functions for test panel
+window.go=go;
+window.toast=toast;
+window.openSheet=openSheet;
+window.closeSheet=closeSheet;
+window.animCount=animCount;
+window.renderDiscover=renderDiscover;
+window.loadDash=loadDash;
+window.loadAnalytics=loadAnalytics;
+window.openMgr=openMgr;
+window.closeMgr=closeMgr;
+window.showVersionNote=showVersionNote;
+window.isFav=isFav;
+window.toggleFav=toggleFav;
+window.addNotif=addNotif;
+window.renderNC=renderNC;
+window.safeImg=safeImg;
+window.escHtml=escHtml;
+window.makeQRImg=makeQRImg;
+window.duplicateDraw=duplicateDraw;
+window.openEdit=openEdit;
+window._adminTest=_adminTest;
+
 // Render all icons
 _renderIcons();
 </script>
@@ -3963,6 +4173,24 @@ _renderIcons();
   <div class="live-prog"><div class="live-prog-bar" id="livePB"></div></div>
 </div>
 
+
+
+<!-- ADMIN TEST PANELİ -->
+<div id="adminTestBd" class="sh-bd" style="z-index:9500"></div>
+<div id="adminTestPanel" class="sheet" style="z-index:9510;max-height:92dvh">
+  <div class="sh-hdl"></div>
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+    <div style="font-family:'Unbounded',sans-serif;font-size:13px;font-weight:700;color:var(--red)">🔬 Admin Test Paneli</div>
+    <button class="xbtn" id="adminTestClose" onclick="closeSheet('adminTestPanel','adminTestBd')"><i data-lucide="x"></i></button>
+  </div>
+  <div id="adminTestResults" style="font-size:11px;line-height:1.8;background:var(--bg3);border-radius:10px;padding:10px;max-height:55dvh;overflow-y:auto;font-family:monospace;margin-bottom:10px">
+    Test başlatılmadı...
+  </div>
+  <div style="display:flex;gap:6px;flex-wrap:wrap">
+    <button class="btn btn-fire btn-sm" id="runAllTests" style="flex:1">Tümünü Test Et</button>
+    <button class="btn btn-ghost btn-sm" id="clearTestLog">Temizle</button>
+  </div>
+</div>
 
 </body>
 </html>
